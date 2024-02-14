@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/market
+    username: raaxiim
+    password: Raax11m17
+  jpa:
+    hibernate:
+      ddl-auto: create
