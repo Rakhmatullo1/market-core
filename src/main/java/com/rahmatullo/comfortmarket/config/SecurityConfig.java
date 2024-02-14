@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.config;
 
+import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.CustomAccessDeniedHandler;
 import com.rahmatullo.comfortmarket.service.exception.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(r->
+                        r.requestMatchers("/auth/**").permitAll().requestMatchers("/hello").hasAuthority(UserRole.ADMIN.name())
+                )
                 .exceptionHandling(ex->ex.accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(applicationConfig.provider())

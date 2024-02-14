@@ -16,7 +16,17 @@ public class GlobalException {
 
     @ExceptionHandler
     public ResponseEntity<ErrorDto> emptyExceptionHandler(EmptyFieldException ex) {
-        return handler(HttpStatus.FORBIDDEN,ex.getMessage());
+        return handler(HttpStatus.UNAUTHORIZED,ex.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDto> existsExceptionHandler(ExistsException ex) {
+        return handler(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDto> existsExceptionHandler(DoesNotMatchException ex) {
+        return handler(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     private ResponseEntity<ErrorDto> handler(HttpStatus status, String message) {

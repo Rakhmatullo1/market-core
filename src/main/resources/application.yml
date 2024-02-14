@@ -5,4 +5,6 @@ spring:
     password: Raax11m17
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
+server:
+  port: 8088

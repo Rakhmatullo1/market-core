@@ -52,9 +52,8 @@ public class AuthFilter extends OncePerRequestFilter {
                     handleException(response, HttpStatus.NOT_FOUND, "username is not found: " + username);
                     return;
                 }
-
                 if(!userDetails.isEnabled()){
-                    filterChain.doFilter(request, response);
+                    handleException(response, HttpStatus.UNAUTHORIZED, "You should be enabled");
                     return;
                 }
 
@@ -67,6 +66,8 @@ public class AuthFilter extends OncePerRequestFilter {
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 }
+
+
             }
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ex) {
