@@ -16,5 +16,7 @@ public class Worker  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne
+    private Premise premise;
+    @OneToOne
     private User user;
 }

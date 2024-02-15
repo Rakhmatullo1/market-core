@@ -31,6 +31,8 @@ public class User implements UserDetails {
     private boolean isEnabled =false;
     @OneToMany
     private List<Premise> premise = new ArrayList<>();
+    @OneToMany
+    private List<Worker> workers = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

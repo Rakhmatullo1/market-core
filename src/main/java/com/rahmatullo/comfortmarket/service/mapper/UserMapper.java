@@ -2,6 +2,7 @@ package com.rahmatullo.comfortmarket.service.mapper;
 
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.EmptyFieldException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -22,6 +23,7 @@ public abstract class UserMapper {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Mapping(target = "workers", ignore = true)
     @Mapping(target = "premise", ignore = true)
     @Mapping(target = "enabled", constant = "false", resultType = Boolean.class)
     @Mapping(target = "fullName", source = "fullName")
@@ -31,6 +33,9 @@ public abstract class UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", source = "role", qualifiedByName = "convertRoleToUserRole")
     public abstract User toUser(RegisterRequestDto requestDto);
+
+    @Mapping(target = "role", expression = "java(user.getRole().name())")
+    public abstract UserDto toUserDto(User user);
 
     @Named("convertRoleToUserRole")
     UserRole convertRoleToUserRole(String role) {

@@ -26,7 +26,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(r->
-                        r.requestMatchers("/auth/**").permitAll().requestMatchers("/hello").hasAuthority(UserRole.ADMIN.name())
+                        r.requestMatchers("/auth/**").permitAll().requestMatchers("/hello").hasAuthority(UserRole.OWNER.name())
                 )
                 .exceptionHandling(ex->ex.accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

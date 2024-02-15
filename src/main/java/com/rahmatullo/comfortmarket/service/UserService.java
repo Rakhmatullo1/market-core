@@ -1,5 +1,16 @@
 package com.rahmatullo.comfortmarket.service;
 
-public interface UserService {
+import com.rahmatullo.comfortmarket.service.dto.UserDto;
+import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
 
+import java.util.List;
+
+public interface UserService {
+    List<UserDto> findAll();
+
+    UserDto findById(Long id);
+
+    UserDto markUserAsEnabled(boolean enabled, Long id);
+
+    UserDtoForOwner getUserInfo(Long id);
 }
