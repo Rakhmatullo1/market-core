@@ -1,8 +1,10 @@
 package com.rahmatullo.comfortmarket.service.dto;
 
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
 public class UserDto {
     private Long id;
     private String username;

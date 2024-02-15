@@ -7,7 +7,7 @@ public class WorkerDto {
     private String fullName;
     private String username;
     private String phoneNumber;
-    private String password;
     private String role;
     private boolean enabled;
+    private String premiseInfo;
 }

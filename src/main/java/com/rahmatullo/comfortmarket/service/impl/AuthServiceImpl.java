@@ -13,9 +13,14 @@ import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +67,25 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Successfully registered");
         return new ResponseBodyDto(jwtService.generateToken(userDetails));
+    }
+
+    @Override
+    public Optional<User> getUserOptional() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(Objects.isNull(authentication)) {
+            throw new NotFoundException("You should sign in");
+        }
+
+        String username = authentication.getName();
+
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public User getUser() {
+        return getUserOptional().orElseThrow(()->{
+            log.warn("User name is not found");
+            throw new RuntimeException("Username is not found");
+        });
     }
 }

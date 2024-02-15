@@ -10,7 +10,7 @@ public interface UserService {
 
     UserDto findById(Long id);
 
-    UserDto markUserAsEnabled(boolean enabled, Long id);
+    UserDto markUserAsEnabled(Long id, Long premiseId);
 
-    UserDtoForOwner getUserInfo(Long id);
+    UserDtoForOwner getUserInfo();
 }

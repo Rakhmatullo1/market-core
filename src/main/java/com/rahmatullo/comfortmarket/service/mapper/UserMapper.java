@@ -1,8 +1,7 @@
 package com.rahmatullo.comfortmarket.service.mapper;
 
 import com.rahmatullo.comfortmarket.entity.User;
-import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.UserDto;
+import com.rahmatullo.comfortmarket.service.dto.*;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.EmptyFieldException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Mapper(injectionStrategy = InjectionStrategy.CONSTRUCTOR, componentModel = "spring")
@@ -22,6 +22,12 @@ public abstract class UserMapper {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private PremiseMapper premiseMapper;
+
+    @Autowired
+    private WorkerMapper workerMapper;
 
     @Mapping(target = "workers", ignore = true)
     @Mapping(target = "premise", ignore = true)
@@ -37,6 +43,10 @@ public abstract class UserMapper {
     @Mapping(target = "role", expression = "java(user.getRole().name())")
     public abstract UserDto toUserDto(User user);
 
+    @Mapping(target = "premiseDtoList", source = "user", qualifiedByName = "getPremises")
+    @Mapping(target = "workers", source = "user", qualifiedByName = "getWorkers")
+    public abstract UserDtoForOwner toUserDtoForOwner(User user);
+
     @Named("convertRoleToUserRole")
     UserRole convertRoleToUserRole(String role) {
         if (Objects.isNull(role) || StringUtils.isEmpty(role)){
@@ -46,6 +56,16 @@ public abstract class UserMapper {
                 .filter(userRole ->Objects.equals(role, userRole.name()))
                 .findFirst()
                 .orElseThrow(()->new NotFoundException("User role is not found"));
+    }
+
+    @Named(value = "getPremises")
+    List<PremiseDto> getPremises(User user) {
+        return user.getPremise().stream().map(premiseMapper::toPremiseDto).toList();
+    }
+
+    @Named(value = "getWorkers")
+    List<WorkerDto> getWorkers(User user) {
+        return user.getWorkers().stream().map(workerMapper::toWorkerDto).toList();
     }
 
     @Named("encodePassword")
