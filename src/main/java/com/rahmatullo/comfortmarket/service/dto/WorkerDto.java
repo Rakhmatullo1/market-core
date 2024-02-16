@@ -10,4 +10,5 @@ public class WorkerDto {
     private String role;
     private boolean enabled;
     private String premiseInfo;
+    private String ownerName;
 }

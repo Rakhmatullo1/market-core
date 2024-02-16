@@ -17,10 +17,12 @@ public abstract class WorkerMapper {
     @Mapping(target = "phoneNumber", source = "worker.user.phoneNumber", defaultValue = "null")
     @Mapping(target = "fullName", source = "worker.user.fullName")
     @Mapping(target = "enabled", source = "worker.user.enabled")
+    @Mapping(target = "ownerName", expression = "java(worker.getOwner().getUsername())")
     public abstract WorkerDto toWorkerDto(Worker worker);
 
     @Mapping(target = "user", source = "user")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "premise", source = "premise")
-    public abstract Worker toWorker(User user, Premise premise);
+    @Mapping(target = "owner", source = "owner")
+    public abstract Worker toWorker(User user, Premise premise, User owner);
 }

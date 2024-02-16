@@ -23,4 +23,6 @@ public class Premise {
     private String name;
     @OneToMany
     private List<Product> products = new ArrayList<>();
+    @OneToOne
+    private User owner;
 }

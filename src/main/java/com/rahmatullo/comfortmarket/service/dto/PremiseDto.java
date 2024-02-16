@@ -11,4 +11,5 @@ public class PremiseDto {
     private String address;
     private String name;
     private List<ProductDto> productDto;
+    private String owner;
 }

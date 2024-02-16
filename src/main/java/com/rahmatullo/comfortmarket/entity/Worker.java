@@ -19,4 +19,6 @@ public class Worker  {
     private Premise premise;
     @OneToOne
     private User user;
+    @OneToOne
+    private User owner;
 }

@@ -33,7 +33,6 @@ public class UserServiceImpl implements UserService {
     private final WorkerRepository workerRepository;
     private final PremiseRepository premiseRepository;
 
-
     @Override
     public List<UserDto> findAll() {
         log.info("Requested to get all users");
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
             throw new DoesNotMatchException(String.format("Premise id is not matched with owner user %s's premises", user.getUsername()));
         };
 
-        Worker savedWorker = workerRepository.save(workerMapper.toWorker(user, premise));
+        Worker savedWorker = workerRepository.save(workerMapper.toWorker(user, premise, ownerUser));
 
         List<Worker> workers = ownerUser.getWorkers();
         workers.add(savedWorker);
