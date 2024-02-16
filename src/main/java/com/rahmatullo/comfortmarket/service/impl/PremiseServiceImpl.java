@@ -5,6 +5,7 @@ import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
+import com.rahmatullo.comfortmarket.repository.WorkerRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
@@ -53,7 +54,7 @@ public class PremiseServiceImpl implements PremiseService {
         log.info("Requested to add new products to premise {}", id);
         Premise premise = toPremise(id);
 
-        Product product = productMapper.toProduct(productRequestDto);
+        Product product = productMapper.toProduct(productRequestDto,premise, authService.getUser());
         List<Product> productList = premise.getProducts();
 
         if(!productRepository.existsByBarcode(productRequestDto.getBarcode())){
