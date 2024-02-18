@@ -3,11 +3,8 @@ package com.rahmatullo.comfortmarket.service.dto;
 import lombok.Data;
 
 @Data
-public class PremiseDto {
+public class CategoryDto {
     private Long id;
-    private String premiseType;
-    private String address;
     private String name;
-    private String owner;
     private int productsCount;
 }

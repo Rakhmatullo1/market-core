@@ -62,12 +62,12 @@ public class UserServiceImpl implements UserService {
         User user = toUser(id);
         user.setEnabled(true);
 
-        Premise premise = premiseRepository.findById(id).orElseThrow(()->{
+        Premise premise = premiseRepository.findById(premiseId).orElseThrow(()->{
             log.warn("Premise is not found");
             throw new NotFoundException("Premise is not found");
         });
 
-        if(ownerUser.getPremise().stream().anyMatch(premise1 -> Objects.equals(premise1,premise))){
+        if(!ownerUser.getPremise().stream().anyMatch(premise1 -> Objects.equals(premise1,premise))){
             log.warn("Does not premise id with yours");
             throw new DoesNotMatchException(String.format("Premise id is not matched with owner user %s's premises", user.getUsername()));
         };

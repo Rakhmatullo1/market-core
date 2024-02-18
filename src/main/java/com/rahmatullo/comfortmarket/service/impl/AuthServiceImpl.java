@@ -7,6 +7,7 @@ import com.rahmatullo.comfortmarket.service.JwtService;
 import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ResponseBodyDto;
 import com.rahmatullo.comfortmarket.service.dto.SignInRequestDto;
+import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -63,6 +64,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = userMapper.toUser(requestDto);
+
+        if(Objects.equals(user.getRole(), UserRole.OWNER)) {
+            user.setEnabled(true);
+        }
+
         UserDetails userDetails  = userRepository.save(user);
 
         log.info("Successfully registered");

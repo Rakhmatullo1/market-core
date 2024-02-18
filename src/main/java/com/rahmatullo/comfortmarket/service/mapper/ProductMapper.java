@@ -14,6 +14,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.Objects;
 
 @Mapper(injectionStrategy = InjectionStrategy.CONSTRUCTOR, componentModel = "spring")
@@ -27,8 +28,10 @@ public abstract  class ProductMapper {
     private WorkerRepository workerRepository;
 
     @Mapping(target = "category", expression = "java(product.getCategory().getName())")
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "date")
     public abstract ProductDto toProductDto(Product product);
 
+    @Mapping(target = "createdAt", expression = "java(getCreatedTime())")
     @Mapping(target = "premise", source = "premise")
     @Mapping(target = "owner", expression = "java(getOwner(user))")
     @Mapping(target = "category", source = "productRequestDto.categoryId", qualifiedByName = "getCategory")
@@ -61,5 +64,14 @@ public abstract  class ProductMapper {
             log.warn("Category is not found ");
             throw new NotFoundException("Category is not found "+id);
         });
+    }
+
+    Date getCreatedTime() {
+        return new Date(System.currentTimeMillis());
+    }
+
+    @Named("date")
+    String date(Date date) {
+        return date.toString();
     }
 }

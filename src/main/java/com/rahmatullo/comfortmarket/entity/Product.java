@@ -13,6 +13,7 @@ import java.util.Date;
 @ToString
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String barcode;
@@ -26,6 +27,6 @@ public class Product {
     @JoinColumn(name = "owner_id")
     private User owner;
     private String addedBy;
-    @OneToOne
+    @ManyToOne
     private Premise premise;
 }

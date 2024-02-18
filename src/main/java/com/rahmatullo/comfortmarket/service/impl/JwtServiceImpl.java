@@ -53,7 +53,7 @@ public class JwtServiceImpl implements JwtService {
        return Jwts.builder()
                 .setClaims(new HashMap<>())
                 .setSubject(userDetails.getUsername())
-                .setExpiration(new Date(System.currentTimeMillis()+ 15*60*1000))
+                .setExpiration(new Date(System.currentTimeMillis()+ 15*24*60*60*1000))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .signWith(SignatureAlgorithm.HS256, getKey())
                 .compact();

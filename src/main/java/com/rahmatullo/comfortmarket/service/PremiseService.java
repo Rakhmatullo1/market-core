@@ -4,8 +4,12 @@ import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 
+import java.util.List;
+
 public interface PremiseService {
     PremiseDto createPremise(PremiseRequestDto premiseRequestDto);
 
     PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto);
+
+    List<PremiseDto> findAll();
 }

@@ -4,7 +4,6 @@ import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.enums.PremiseType;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.InjectionStrategy;
@@ -25,7 +24,7 @@ public abstract class PremiseMapper {
     private ProductMapper productMapper;
 
     @Mapping(target = "owner", source = "premise.owner.fullName")
-    @Mapping(target = "productDto", expression = "java(getProducts(premise.getProducts()))")
+    @Mapping(target = "productsCount", source = "premise.products", qualifiedByName = "getProducts")
     @Mapping(target = "premiseType", expression = "java(premise.getType().name())")
     public abstract PremiseDto toPremiseDto(Premise premise);
 
@@ -35,8 +34,9 @@ public abstract class PremiseMapper {
     @Mapping(target = "id", ignore = true)
      public abstract Premise toPremise(PremiseRequestDto premiseRequestDto);
 
-    List<ProductDto> getProducts(List<Product> productList) {
-        return productList.stream().map(product -> productMapper.toProductDto(product)).toList();
+    @Named("getProducts")
+    int getProducts(List<Product> productList) {
+        return productList.size();
     }
 
     @Named("getType")
