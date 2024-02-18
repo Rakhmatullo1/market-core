@@ -10,4 +10,6 @@ public interface CategoryService {
     CategoryDto addCategory(CategoryRequestDto categoryRequestDto);
 
     List<CategoryDto> findAllCategory();
+
+    CategoryDto addProduct2Category(Long id, Product product);
 }

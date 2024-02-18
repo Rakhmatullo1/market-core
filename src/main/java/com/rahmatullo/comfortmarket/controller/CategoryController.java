@@ -1,11 +1,8 @@
 package com.rahmatullo.comfortmarket.controller;
 
-import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.dto.CategoryDto;
 import com.rahmatullo.comfortmarket.service.dto.CategoryRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
-import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
