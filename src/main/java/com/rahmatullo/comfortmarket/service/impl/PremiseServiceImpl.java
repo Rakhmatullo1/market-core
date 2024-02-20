@@ -72,10 +72,11 @@ public class PremiseServiceImpl implements PremiseService {
             log.warn("the product exists");
             throw new ExistsException("The product exists "+ productRequestDto.getBarcode());
         }
+        product = productRepository.save(product);
 
-        categoryService.addProduct2Category(product.getCategory().getId(), product);
+        categoryService.addProduct2Category( product);
 
-        productList.add(productRepository.save(product));
+        productList.add(product);
         premise.setProducts(productList);
 
         return premiseMapper.toPremiseDto(premiseRepository.save(premise));
@@ -106,7 +107,21 @@ public class PremiseServiceImpl implements PremiseService {
                 .map(premiseMapper::toPremiseDto).toList();
     }
 
-    private Premise toPremise(Long id) {
+    @Override
+    public void removeProductsFromPremise(Product product) {
+        log.info("Requested to remove product  {}  from {}", product, product.getPremise().getId());
+        Premise premise = toPremise(product.getPremise().getId());
+
+        List<Product> products = premise.getProducts();
+        products.remove(product);
+        premise.setProducts(products);
+
+        premiseRepository.save(premise);
+        log.info("successfully deleted");
+    }
+
+    @Override
+    public Premise toPremise(Long id) {
         return premiseRepository.findById(id).orElseThrow(()->{
             log.warn("premise is not found");
             throw new NotFoundException("Premise is not found");

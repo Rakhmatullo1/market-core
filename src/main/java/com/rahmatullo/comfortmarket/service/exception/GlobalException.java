@@ -3,6 +3,7 @@ package com.rahmatullo.comfortmarket.service.exception;
 import com.rahmatullo.comfortmarket.service.dto.ErrorDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -27,6 +28,11 @@ public class GlobalException {
     @ExceptionHandler
     public ResponseEntity<ErrorDto> existsExceptionHandler(DoesNotMatchException ex) {
         return handler(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorDto> usernameNotFoundExceptionHandler(UsernameNotFoundException ex) {
+        return handler(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     private ResponseEntity<ErrorDto> handler(HttpStatus status, String message) {

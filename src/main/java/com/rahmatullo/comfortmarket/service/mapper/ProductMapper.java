@@ -40,6 +40,18 @@ public abstract  class ProductMapper {
     @Mapping(target = "name", source = "productRequestDto.name")
     public abstract Product toProduct(ProductRequestDto productRequestDto, Premise premise, User user);
 
+    @Mapping(target = "id", source = "product.id")
+    @Mapping(target = "name", source = "productRequestDto.name")
+    @Mapping(target = "barcode", source = "productRequestDto.barcode")
+    @Mapping(target = "createdAt", source = "product.createdAt")
+    @Mapping(target = "count", source = "productRequestDto.count")
+    @Mapping(target = "price", source = "productRequestDto.price")
+    @Mapping(target = "owner", source = "product.owner")
+    @Mapping(target = "addedBy", source = "product.addedBy")
+    @Mapping(target = "premise", source = "product.premise")
+    @Mapping(target = "category", ignore = true)
+    public abstract Product toProduct(ProductRequestDto productRequestDto, Product product);
+
     @Named("addedBy")
     String addedBy(User user) {
         return user.getUsername();

@@ -1,7 +1,6 @@
 package com.rahmatullo.comfortmarket.config;
 
 import com.rahmatullo.comfortmarket.repository.UserRepository;
-import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
@@ -22,7 +22,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService(){
         return username -> userRepository
                 .findByUsername(username)
-                .orElseThrow(()->new NotFoundException("Username is not found"));
+                .orElseThrow(()->new UsernameNotFoundException("username is not found"));
     }
 
     @Bean

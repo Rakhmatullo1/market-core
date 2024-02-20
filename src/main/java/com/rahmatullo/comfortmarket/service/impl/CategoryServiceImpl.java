@@ -40,12 +40,30 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto addProduct2Category(Long id, Product product) {
-        Category category = categoryRepository.findById(id).orElseThrow(()->new NotFoundException("Category is not found"));
+    public void addProduct2Category( Product product) {
+        Category category = toCategory(product.getCategory().getId());
 
         List<Product> products =category.getProductList();
         products.add(product);
 
-        return categoryMapper.toCategoryDto(categoryRepository.save(category));
+        categoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
+
+    @Override
+    public void removeProductFromCategory( Product product) {
+        log.info("Requested to remove {} from category {}", product, product.getCategory().getId());
+        Category category = toCategory(product.getCategory().getId());
+
+        List<Product> products = category.getProductList();
+        products.remove(product);
+        category.setProductList(products);
+
+        categoryRepository.save(category);
+        log.info("Successfully deleted");
+    }
+
+    @Override
+    public Category toCategory(Long id) {
+        return categoryRepository.findById(id).orElseThrow(()->new NotFoundException("Category is not found"));
     }
 }

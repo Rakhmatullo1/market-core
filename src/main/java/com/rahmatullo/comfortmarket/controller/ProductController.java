@@ -1,7 +1,10 @@
 package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.ProductService;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
+import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,5 +31,15 @@ public class ProductController {
     @GetMapping()
     public ResponseEntity<List<ProductDto>> getProductsPremise() {
         return ResponseEntity.ok(productService.getProductByOwner());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto){
+        return ResponseEntity.ok(productService.updateProduct(id, productRequestDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id){
+        return ResponseEntity.ok(productService.deleteProduct(id));
     }
 }
