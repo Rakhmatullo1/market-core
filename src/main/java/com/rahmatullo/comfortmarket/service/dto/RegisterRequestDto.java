@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.service.dto;
 
+import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
@@ -16,5 +17,5 @@ public class RegisterRequestDto {
     @NotNull(message = "password cannot be null")
     private String password;
     @NotNull(message = "role cannot be null")
-    private String role;
+    private UserRole role;
 }

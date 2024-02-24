@@ -3,11 +3,13 @@ package com.rahmatullo.comfortmarket.service.impl;
 import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
-import com.rahmatullo.comfortmarket.entity.Worker;
-import com.rahmatullo.comfortmarket.repository.*;
+import com.rahmatullo.comfortmarket.repository.PremiseRepository;
+import com.rahmatullo.comfortmarket.repository.ProductRepository;
+import com.rahmatullo.comfortmarket.repository.UserRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
-import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.PremiseService;
+import com.rahmatullo.comfortmarket.service.ProductService;
+import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
@@ -30,13 +32,13 @@ import java.util.Objects;
 public class PremiseServiceImpl implements PremiseService {
 
     private final PremiseRepository premiseRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
     private final PremiseMapper premiseMapper;
     private final AuthService authService;
     private final ProductMapper productMapper;
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
-    private final WorkerRepository workerRepository;
-    private final CategoryService categoryService;
+    private final ProductService productService;
+    private final UserService userService;
 
     @Override
     public PremiseDto createPremise(PremiseRequestDto premiseRequestDto) {
@@ -44,10 +46,12 @@ public class PremiseServiceImpl implements PremiseService {
         Premise premise = premiseMapper.toPremise(premiseRequestDto);
 
         User ownerUser = authService.getUser();
+
         if(!Objects.equals(ownerUser.getRole(), UserRole.OWNER)){
             log.warn("user role does not match {}", ownerUser.getRole().name());
             throw new DoesNotMatchException("Your role does not match");
         }
+
         premise.setOwner(ownerUser);
         premise = premiseRepository.save(premise);
 
@@ -66,16 +70,20 @@ public class PremiseServiceImpl implements PremiseService {
         Premise premise = toPremise(id);
 
         Product product = productMapper.toProduct(productRequestDto,premise, authService.getUser());
-        List<Product> productList = premise.getProducts();
 
         if(productRepository.existsByBarcode(productRequestDto.getBarcode())){
             log.warn("the product exists");
             throw new ExistsException("The product exists "+ productRequestDto.getBarcode());
         }
+
+        User owner = checkAndGetOwner(premise);
+
+        product.setOwner(owner);
         product = productRepository.save(product);
 
-        categoryService.addProduct2Category( product);
+        productService.addProduct2Category( product);
 
+        List<Product> productList = premise.getProducts();
         productList.add(product);
         premise.setProducts(productList);
 
@@ -84,40 +92,26 @@ public class PremiseServiceImpl implements PremiseService {
 
     @Override
     public List<PremiseDto> findAll() {
-
+        log.info("Requested to get all premises");
         User user = authService.getUser();
-
-        if(Objects.equals(user.getRole(), UserRole.OWNER)){
-            return user.getPremise().stream()
-                    .map(premiseMapper::toPremiseDto).toList();
-        }
-
-        Worker worker = workerRepository.getWorkerByUser(user).orElseThrow(()->{
-            log.warn("user is not found");
-            throw new NotFoundException("User is not found");
-        });
-
-        if(Objects.isNull(worker.getOwner())){
-            log.warn("User is not enabled yet");
-            throw new DoesNotMatchException("User has not been enabled yet");
-        }
-
-        return worker.getOwner().getPremise()
+        return user.getPremise()
                 .stream()
                 .map(premiseMapper::toPremiseDto).toList();
     }
 
     @Override
-    public void removeProductsFromPremise(Product product) {
-        log.info("Requested to remove product  {}  from {}", product, product.getPremise().getId());
-        Premise premise = toPremise(product.getPremise().getId());
+    public PremiseDto addWorkers2Premise(Long id, Long userId) {
+        log.info("Requested to add worker {} to premise {}", userId, id);
+        Premise premise = toPremise(id);
 
-        List<Product> products = premise.getProducts();
-        products.remove(product);
-        premise.setProducts(products);
+        User worker = userService.toUser(userId);
 
-        premiseRepository.save(premise);
-        log.info("successfully deleted");
+        userService.checkUser(worker);
+        userService.addUsers2Premise(worker, premise);
+
+        userRepository.save(worker);
+        log.info("Successfully saved user to premise ");
+        return premiseMapper.toPremiseDto(premise);
     }
 
     @Override
@@ -126,5 +120,19 @@ public class PremiseServiceImpl implements PremiseService {
             log.warn("premise is not found");
             throw new NotFoundException("Premise is not found");
         });
+    }
+
+    private User checkAndGetOwner(Premise premise) {
+        User owner = authService.getUser();
+
+        if(!Objects.equals(owner.getRole(), UserRole.OWNER)) {
+            owner = owner.getOwner();
+        }
+
+        if(!Objects.equals(premise.getOwner(), owner)) {
+            log.warn("This premise does not match with owner's premise");
+            throw new DoesNotMatchException("Premise does not match with owner's premise");
+        }
+        return owner;
     }
 }

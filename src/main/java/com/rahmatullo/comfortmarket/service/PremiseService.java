@@ -1,7 +1,6 @@
 package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.Premise;
-import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
@@ -15,7 +14,7 @@ public interface PremiseService {
 
     List<PremiseDto> findAll();
 
-    void removeProductsFromPremise(Product product);
+    PremiseDto addWorkers2Premise(Long id, Long userId);
 
     Premise toPremise(Long id);
 }

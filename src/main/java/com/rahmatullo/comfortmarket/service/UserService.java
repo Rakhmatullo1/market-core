@@ -1,5 +1,7 @@
 package com.rahmatullo.comfortmarket.service;
 
+import com.rahmatullo.comfortmarket.entity.Premise;
+import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
 
@@ -13,4 +15,10 @@ public interface UserService {
     UserDto markUserAsEnabled(Long id, Long premiseId);
 
     UserDtoForOwner getUserInfo();
+
+    void checkUser(User userResult);
+
+    void addUsers2Premise(User user, Premise premise);
+
+    User toUser(Long id);
 }

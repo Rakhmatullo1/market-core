@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.service.dto;
 
+import com.rahmatullo.comfortmarket.service.enums.PremiseType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +15,5 @@ public class PremiseRequestDto {
     @NotNull(message = "address cannot be null")
     private String address;
     @NotNull(message = "premiseType cannot be null")
-    private String premiseType;
+    private PremiseType type;
 }

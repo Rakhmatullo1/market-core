@@ -8,3 +8,8 @@ spring:
       ddl-auto: none
 server:
   port: 8088
+
+storage:
+  photoLocation: assets/photos
+cm:
+  address: localhost:8088

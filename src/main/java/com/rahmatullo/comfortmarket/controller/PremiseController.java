@@ -28,6 +28,11 @@ public class PremiseController {
         return ResponseEntity.ok(premiseService.addProductsToPremise(id, productRequestDto));
     }
 
+    @PostMapping("/{id}/add_user/{userId}")
+    public ResponseEntity<PremiseDto> addUsers(@PathVariable Long id, @PathVariable Long userId){
+        return ResponseEntity.ok(premiseService.addWorkers2Premise(id, userId));
+    }
+
     @GetMapping
     public ResponseEntity<List<PremiseDto>> findAll(){
         return ResponseEntity.ok(premiseService.findAll());

@@ -29,11 +29,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(r->
                         {
                             r.requestMatchers("/auth/**").permitAll();
-                            r.requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
-                            r.requestMatchers("/users/**").hasAuthority(UserRole.OWNER.name());
+                            r.requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority(UserRole.ADMIN.name() ,UserRole.OWNER.name(), UserRole.WORKER.name());
+                            r.requestMatchers("/users/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.OWNER.name());
                             r.requestMatchers("/category/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
-                            r.requestMatchers( "/premise/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
-                            r.requestMatchers("/premise").hasAuthority(UserRole.OWNER.name());
+                            r.requestMatchers( HttpMethod.GET, "/premise/**" ).hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
+                            r.requestMatchers("/premise/{id}/add-product/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
+                            r.requestMatchers("/premise/**").hasAuthority(UserRole.OWNER.name());
                             r.requestMatchers("/products/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
                         }
                 )

@@ -7,7 +7,6 @@ import com.rahmatullo.comfortmarket.service.JwtService;
 import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ResponseBodyDto;
 import com.rahmatullo.comfortmarket.service.dto.SignInRequestDto;
-import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
         log.info("Requested to log in {}", requestDto.getUsername());
 
         User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(()->{
-            log.warn("user name is not found {}",requestDto.getUsername() );
+            log.warn("user name is not found {}", requestDto.getUsername() );
             throw new NotFoundException("User name is not found");
         });
 
@@ -60,19 +58,14 @@ public class AuthServiceImpl implements AuthService {
 
         if(userRepository.existsByUsername(username)) {
             log.warn("Username exists in db {}", username);
-            throw new ExistsException("username exists, " +username);
+            throw new ExistsException("username exists, " + username);
         }
 
         User user = userMapper.toUser(requestDto);
-
-        if(Objects.equals(user.getRole(), UserRole.OWNER)) {
-            user.setEnabled(true);
-        }
-
-        UserDetails userDetails  = userRepository.save(user);
+        user.setPassword(encoder.encode(requestDto.getPassword()));
 
         log.info("Successfully registered");
-        return new ResponseBodyDto(jwtService.generateToken(userDetails));
+        return new ResponseBodyDto(jwtService.generateToken(userRepository.save(user)));
     }
 
     @Override

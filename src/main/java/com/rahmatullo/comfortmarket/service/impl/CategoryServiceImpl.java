@@ -1,11 +1,11 @@
 package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.entity.Category;
-import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.repository.CategoryRepository;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.dto.CategoryDto;
 import com.rahmatullo.comfortmarket.service.dto.CategoryRequestDto;
+import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto addCategory(CategoryRequestDto categoryRequestDto) {
         log.info("Requested to add new category ");
+
+        if(categoryRepository.existsByName(categoryRequestDto.getName())){
+            log.warn("The category exists");
+            throw new ExistsException("Category exists " + categoryRequestDto.getName());
+        }
+
         Category category = categoryMapper.toCategory(categoryRequestDto);
         log.info("Successfully added category");
         return categoryMapper.toCategoryDto(categoryRepository.save(category));
@@ -40,26 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void addProduct2Category( Product product) {
-        Category category = toCategory(product.getCategory().getId());
-
-        List<Product> products =category.getProductList();
-        products.add(product);
-
-        categoryMapper.toCategoryDto(categoryRepository.save(category));
-    }
-
-    @Override
-    public void removeProductFromCategory( Product product) {
-        log.info("Requested to remove {} from category {}", product, product.getCategory().getId());
-        Category category = toCategory(product.getCategory().getId());
-
-        List<Product> products = category.getProductList();
-        products.remove(product);
-        category.setProductList(products);
-
-        categoryRepository.save(category);
-        log.info("Successfully deleted");
+    public CategoryDto findById(Long id) {
+        return categoryMapper.toCategoryDto(toCategory(id));
     }
 
     @Override

@@ -10,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class UserDtoForOwner extends UserDto{
-    private List<PremiseDto> premiseDtoList;
-    private List<WorkerDto> workers;
+    private List<PremiseDto> premises;
+    private List<UserDto> workers;
 }

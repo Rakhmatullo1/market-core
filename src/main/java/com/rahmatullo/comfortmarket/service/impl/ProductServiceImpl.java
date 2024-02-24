@@ -1,18 +1,21 @@
 package com.rahmatullo.comfortmarket.service.impl;
 
-import com.rahmatullo.comfortmarket.entity.*;
+import com.rahmatullo.comfortmarket.entity.Category;
+import com.rahmatullo.comfortmarket.entity.Premise;
+import com.rahmatullo.comfortmarket.entity.Product;
+import com.rahmatullo.comfortmarket.entity.User;
+import com.rahmatullo.comfortmarket.repository.CategoryRepository;
+import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
-import com.rahmatullo.comfortmarket.repository.WorkerRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.CategoryService;
-import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
-import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
+import com.rahmatullo.comfortmarket.service.mapper.CategoryMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,41 +30,43 @@ import java.util.Objects;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final PremiseRepository premiseRepository;
     private final ProductMapper productMapper;
+    private final CategoryMapper categoryMapper;
     private final CategoryService categoryService;
     private final AuthService authService;
-    private final PremiseService premiseService;
-    private final WorkerRepository workerRepository;
 
     @Override
     public List<ProductDto> getProductsByCategoryId(Long categoryId) {
+        log.info("Requested to get all products by category");
         Category category = categoryService.toCategory(categoryId);
-        return getProducts(productRepository.getAllByCategory(category));
+
+        User owner = checkAnGetOwner();
+
+        log.info("Successfully fetched all product which are belonged to {} {}", owner.getUsername(), owner.getRole());
+        return getProducts(productRepository.getAllByCategoryAndOwner(category, owner));
     }
 
     @Override
     public List<ProductDto> getProductsByPremiseId(Long premiseId) {
-        Premise premise = premiseService.toPremise(premiseId);
+        log.info("Requested to get products by premise {}", premiseId);
+        Premise premise = toPremise(premiseId);
         return getProducts(productRepository.getAllByPremise(premise));
     }
 
     @Override
     public List<ProductDto> getProductByOwner() {
-        User user =  authService.getUser();
+        return getProducts(productRepository.getAllByOwner(checkAnGetOwner()));
+    }
 
-        if(Objects.equals(user.getRole(), UserRole.OWNER)){
-            return getProducts(productRepository.getAllByOwner(user));
-        }
+    @Override
+    public ProductDto getById(Long id) {
+        User owner = checkAnGetOwner();
 
-        Worker worker = workerRepository.getWorkerByUser(user).orElseThrow(()->{
-           throw new NotFoundException("user is not found");
-        });
+        Product product = productRepository.findByIdAndOwner(id, owner).orElseThrow(()->new NotFoundException("Product is not found"));
 
-        if(Objects.isNull(worker.getOwner())) {
-            throw new DoesNotMatchException("You have not been enabled yet");
-        }
-
-        return getProducts(productRepository.getAllByOwner(worker.getOwner()));
+        return productMapper.toProductDto(product);
     }
 
     @Override
@@ -69,14 +74,14 @@ public class ProductServiceImpl implements ProductService {
         log.warn("Requested to update product with id {}", id);
         Product product = toProduct(id);
 
-        categoryService.removeProductFromCategory( product);
-
-        Category category = categoryService.toCategory(productRequestDto.getCategoryId());
+        if(!Objects.equals(product.getCategory().getId(), productRequestDto.getCategoryId())){
+            removeProductFromCategory(product);
+            Category category = categoryService.toCategory(productRequestDto.getCategoryId());
+            product.setCategory(category);
+            addProduct2Category( product);
+        }
 
         product = productMapper.toProduct(productRequestDto, product);
-        product.setCategory(category);
-
-        categoryService.addProduct2Category( product);
 
         log.info("Successfully updated");
         return productMapper.toProductDto(productRepository.save(product));
@@ -87,8 +92,8 @@ public class ProductServiceImpl implements ProductService {
         log.info("Requested to delete product {}", id);
         Product product = toProduct(id);
 
-        categoryService.removeProductFromCategory( product);
-        premiseService.removeProductsFromPremise(product);
+        removeProductFromCategory( product);
+        removeProductsFromPremise(product);
         productRepository.delete(product);
         log.info("Successfully deleted");
         return new MessageDto("Successfully deleted");
@@ -98,7 +103,60 @@ public class ProductServiceImpl implements ProductService {
         return products.stream().map(productMapper::toProductDto).toList();
     }
 
-    private Product toProduct(Long id){
+    @Override
+    public Product toProduct(Long id){
         return productRepository.findById(id).orElseThrow(()->new NotFoundException("Product is not found"));
+    }
+
+    @Override
+    public void addProduct2Category( Product product) {
+        Category category = categoryService.toCategory(product.getCategory().getId());
+
+        List<Product> products =category.getProductList();
+        products.add(product);
+
+        categoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
+
+    @Override
+    public void removeProductsFromPremise(Product product) {
+        log.info("Requested to remove product  {}  from {}", product, product.getPremise().getId());
+        Premise premise = toPremise(product.getPremise().getId());
+
+        List<Product> products = premise.getProducts();
+        products.remove(product);
+        premise.setProducts(products);
+
+        premiseRepository.save(premise);
+        log.info("successfully deleted");
+    }
+
+    @Override
+    public void removeProductFromCategory( Product product) {
+        log.info("Requested to remove {} from category {}", product.getName(), product.getCategory().getId());
+        Category category = categoryService.toCategory(product.getCategory().getId());
+
+        List<Product> products = category.getProductList();
+        products.remove(product);
+        category.setProductList(products);
+
+        categoryRepository.save(category);
+        log.info("Successfully deleted");
+    }
+
+    public Premise toPremise(Long id) {
+        return premiseRepository.findById(id).orElseThrow(()->{
+            log.warn("premise is not found");
+            throw new NotFoundException("Premise is not found");
+        });
+    }
+
+    private User checkAnGetOwner() {
+        User owner = authService.getUser();
+
+        if(!Objects.equals(owner.getRole(), UserRole.OWNER)){
+            owner = owner.getOwner();
+        }
+        return owner;
     }
 }

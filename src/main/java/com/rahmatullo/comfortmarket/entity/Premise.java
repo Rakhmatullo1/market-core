@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,6 +25,8 @@ public class Premise {
     private String name;
     @OneToMany
     private List<Product> products = new ArrayList<>();
-    @OneToOne
-    private User owner;
+    @ManyToOne
+    private User owner ;
+    @ManyToMany(mappedBy = "premise")
+    private Set<User> workers = new HashSet<>();
 }

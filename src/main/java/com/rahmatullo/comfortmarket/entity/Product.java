@@ -20,6 +20,7 @@ public class Product {
     private Date createdAt;
     private int count;
     private Double price;
+    private String url;
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

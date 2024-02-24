@@ -35,6 +35,11 @@ public class GlobalException {
         return handler(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorDto> fileUploadExceptionHandler(FileUploadException ex) {
+        return handler(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     private ResponseEntity<ErrorDto> handler(HttpStatus status, String message) {
         return new ResponseEntity<>(ErrorDto
                 .builder()

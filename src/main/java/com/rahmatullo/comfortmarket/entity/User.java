@@ -7,10 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -24,14 +21,20 @@ public class User implements UserDetails {
     private String fullName;
     private String username;
     private String phoneNumber;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<User> workers = new HashSet<>();
     private String password;
+
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
     private boolean isEnabled =false;
-    @OneToMany
+    @ManyToMany
+    @JoinTable(name = "user_premise", joinColumns = @JoinColumn(name = "worker_id"), inverseJoinColumns = @JoinColumn(name = "premise_id"))
     private List<Premise> premise = new ArrayList<>();
-    @OneToMany
-    private List<Worker> workers = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
