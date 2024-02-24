@@ -1,13 +1,18 @@
 package com.rahmatullo.comfortmarket.service.exception;
 
 import com.rahmatullo.comfortmarket.service.dto.ErrorDto;
+import com.rahmatullo.comfortmarket.service.dto.ErrorResponseValidation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalException {
 
     @ExceptionHandler
@@ -40,7 +45,24 @@ public class GlobalException {
         return handler(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponseValidation> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException ex) {
+        log.warn(ex.getMessage());
+        ErrorResponseValidation errors = ErrorResponseValidation
+                .builder()
+                .errors(ex.getBindingResult().getAllErrors().stream().map(error-> {
+                    String fieldName = ((FieldError) error).getField();
+                    String errorMessage = error.getDefaultMessage();
+                    return String.format("%s: %s", fieldName, errorMessage);
+                }).toList())
+                .httpStatusCode(HttpStatus.BAD_REQUEST.value())
+                .timeStamp(System.currentTimeMillis())
+                .build();
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<ErrorDto> handler(HttpStatus status, String message) {
+        log.info(message);
         return new ResponseEntity<>(ErrorDto
                 .builder()
                 .message(message)

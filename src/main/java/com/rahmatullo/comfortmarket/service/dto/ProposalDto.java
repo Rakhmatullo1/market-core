@@ -15,6 +15,6 @@ public class ProposalDto {
     private ProposalStatus status;
     private Long count;
     private Double sellAmount;
-    private ProductDto productDto;
-
+    private ProductDto product;
+    private String toUser;
 }

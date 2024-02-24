@@ -84,13 +84,11 @@ public class UserServiceImpl implements UserService {
 
         User user = authService.getUser();
         UserDtoForOwner userDtoForOwner = userMapper.toUserDtoForOwner(user);
-        userDtoForOwner.setPremises(user.getPremise().stream().map(premise -> {
-            PremiseDto premiseDto = premiseMapper.toPremiseDto(premise);
-            premiseDto.setWorkers(null);
-            premiseDto.setProducts(null);
-            return premiseDto;
-        }).toList());
-        userDtoForOwner.setWorkers(user.getWorkers().stream().map(userMapper::toUserDto).toList());
+
+        List<UserDto> users =user.getWorkers().stream().map(userMapper::toUserDto).toList();
+
+        userDtoForOwner.setWorkers(getList(users));
+        userDtoForOwner.setPremises(getList(getPremises4Owner(user)));
 
         log.info("Successfully fetched user info {}", user.getUsername());
         return userDtoForOwner;
@@ -143,5 +141,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public User toUser(Long id) {
         return userRepository.findById(id).orElseThrow(()->new NotFoundException("User is not found"));
+    }
+
+    private <T> List<T> getList(List<T> list) {
+        if(list.size()>3) {
+            return list.subList(0,3);
+        }
+        return list;
+    }
+
+    private List<PremiseDto> getPremises4Owner(User user) {
+        return  user.getPremise().stream().map(premise -> {
+            PremiseDto premiseDto = premiseMapper.toPremiseDto(premise);
+            premiseDto.setWorkers(null);
+            premiseDto.setProducts(null);
+            return premiseDto;
+        }).toList();
     }
 }

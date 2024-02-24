@@ -7,6 +7,7 @@ import com.rahmatullo.comfortmarket.service.JwtService;
 import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ResponseBodyDto;
 import com.rahmatullo.comfortmarket.service.dto.SignInRequestDto;
+import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -86,5 +87,16 @@ public class AuthServiceImpl implements AuthService {
             log.warn("User name is not found");
             throw new RuntimeException("Username is not found");
         });
+    }
+
+    @Override
+    public User getOwner() {
+        User user = getUser();
+
+        if(!Objects.equals(user.getRole(), UserRole.OWNER)) {
+            user = user.getOwner();
+        }
+
+        return user;
     }
 }

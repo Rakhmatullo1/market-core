@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: classpath:/sql/changes.xml

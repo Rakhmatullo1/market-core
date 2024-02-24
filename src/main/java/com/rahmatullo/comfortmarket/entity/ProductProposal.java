@@ -31,4 +31,6 @@ public class ProductProposal {
     @ManyToOne
     private Product product;
     private String approvedBy;
+    @ManyToOne
+    private User toUser;
 }

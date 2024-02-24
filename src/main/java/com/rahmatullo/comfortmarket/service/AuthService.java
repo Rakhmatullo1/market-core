@@ -15,4 +15,6 @@ public interface AuthService {
     Optional<User> getUserOptional();
 
     User getUser();
+
+    User getOwner();
 }
