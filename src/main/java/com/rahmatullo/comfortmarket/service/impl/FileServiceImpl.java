@@ -33,7 +33,7 @@ import java.util.Objects;
 @Slf4j
 public class FileServiceImpl implements FileService {
 
-    private static final String HOST_PHOTO =  "http://%s/file/assets/photos/%s%s";
+    private static final String HOST_PHOTO =  "http://%s/products/assets/photos/%s%s";
 
     @Value("${cm.address}")
     private String address;

@@ -35,6 +35,7 @@ public class SecurityConfig {
                             r.requestMatchers( HttpMethod.GET, "/premise/**" ).hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
                             r.requestMatchers("/premise/{id}/add-product/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
                             r.requestMatchers("/premise/**").hasAuthority(UserRole.OWNER.name());
+                            r.requestMatchers(HttpMethod.GET, "/products/assets/photos/**").permitAll();
                             r.requestMatchers("/products/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
                         }
                 )

@@ -38,6 +38,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductByOwner());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id){
+        return ResponseEntity.ok(productService.getById(id));
+    }
+
     @GetMapping("/assets/photos/{name}")
     public ResponseEntity<Resource> load(@PathVariable String name) throws MalformedURLException {
         return ResponseEntity
