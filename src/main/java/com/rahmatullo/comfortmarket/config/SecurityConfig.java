@@ -38,6 +38,7 @@ public class SecurityConfig {
                             r.requestMatchers(HttpMethod.GET, "/products/assets/photos/**").permitAll();
                             r.requestMatchers("/products/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
                             r.requestMatchers("/proposal/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
+                            r.requestMatchers("/proposal/decision/**").hasAuthority(UserRole.OWNER.name());
                         }
                 )
                 .exceptionHandling(ex->ex.accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(jwtAuthenticationEntryPoint))

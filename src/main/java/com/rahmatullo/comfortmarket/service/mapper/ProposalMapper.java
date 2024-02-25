@@ -39,6 +39,20 @@ public abstract class ProposalMapper {
     @Mapping(target = "createdAt", expression = "java(getCreatedTime())")
     public abstract ProductProposal toProposal(ProposalRequestDto proposalRequestDto);
 
+    @Mapping(target = "toUser", source = "proposal.toUser")
+    @Mapping(target = "approvedBy", ignore = true)
+    @Mapping(target = "product", source = "proposalRequestDto.productId", qualifiedByName = "getProduct")
+    @Mapping(target = "createdBy", source = "proposal.createdBy")
+    @Mapping(target = "status", source = "proposal.status")
+    @Mapping(target = "id", source = "proposal.id")
+    @Mapping(target = "createdAt", source = "proposal.createdAt")
+    @Mapping(target = "name", source = "proposalRequestDto.name")
+    @Mapping(target = "description", source = "proposalRequestDto.description")
+    @Mapping(target = "action", source = "proposalRequestDto.action")
+    @Mapping(target = "count", source = "proposalRequestDto.count")
+    @Mapping(target = "sellAmount", source = "proposalRequestDto.sellAmount")
+    public abstract ProductProposal toProposal(ProposalRequestDto proposalRequestDto, ProductProposal proposal);
+
     @Mapping(target = "product", source = "proposal.product",  qualifiedByName = "getProduct")
     @Mapping(target = "toUser", source = "proposal.toUser", qualifiedByName = "getUserName")
     @Mapping(target = "createdAt", expression = "java(proposal.getCreatedAt().toString())")
