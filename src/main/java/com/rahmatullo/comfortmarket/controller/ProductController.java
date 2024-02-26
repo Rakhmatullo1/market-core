@@ -69,4 +69,9 @@ public class ProductController {
     public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id){
         return ResponseEntity.ok(productService.deleteProduct(id));
     }
+
+    @PostMapping("/upload_file/to/products")
+    public ResponseEntity<MessageDto> convertXSLFile(@RequestParam MultipartFile file) {
+        return ResponseEntity.ok(productService.convertXLSFile2Products(file));
+    }
 }

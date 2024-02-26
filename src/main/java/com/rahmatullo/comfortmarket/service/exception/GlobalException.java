@@ -59,6 +59,11 @@ public class GlobalException {
     }
 
     @ExceptionHandler
+    public  ResponseEntity<ErrorDto> illegalStateExceptionHandler(IllegalStateException ex){
+        return  handler(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler
     public ResponseEntity<ErrorDto> malformedJwtExceptionHandler(MalformedJwtException ex) {
         return handler(HttpStatus.BAD_REQUEST, ex.getMessage());
     }

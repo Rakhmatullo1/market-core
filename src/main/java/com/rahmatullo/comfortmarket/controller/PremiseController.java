@@ -1,6 +1,7 @@
 package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.PremiseService;
+import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PremiseController {
 
     private final PremiseService premiseService;
+    private final ProductService productService;
 
     @PostMapping()
     public ResponseEntity<PremiseDto> createPremise(@Valid @RequestBody PremiseRequestDto premiseRequestDto) {
@@ -26,7 +28,7 @@ public class PremiseController {
 
     @PostMapping("/{id}/add-product")
     public ResponseEntity<PremiseDto> addProducts(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto){
-        return ResponseEntity.ok(premiseService.addProductsToPremise(id, productRequestDto));
+        return ResponseEntity.ok(productService.addProductsToPremise(id, productRequestDto));
     }
 
     @PostMapping("/{id}/add_user/{userId}")

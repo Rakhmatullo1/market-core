@@ -1,7 +1,6 @@
 package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.entity.Premise;
-import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
@@ -12,10 +11,8 @@ import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
-import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
@@ -65,31 +62,7 @@ public class PremiseServiceImpl implements PremiseService {
         return premiseMapper.toPremiseDto(premise);
     }
 
-    @Override
-    public PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto) {
-        log.info("Requested to add new products to premise {}", id);
-        Premise premise = toPremise(id);
 
-        Product product = productMapper.toProduct(productRequestDto,premise, authService.getUser());
-
-        if(productRepository.existsByBarcode(productRequestDto.getBarcode())){
-            log.warn("the product exists");
-            throw new ExistsException("The product exists "+ productRequestDto.getBarcode());
-        }
-
-        User owner = checkAndGetOwner(premise);
-
-        product.setOwner(owner);
-        product = productRepository.save(product);
-
-        productService.addProduct2Category( product);
-
-        List<Product> productList = premise.getProducts();
-        productList.add(product);
-        premise.setProducts(productList);
-
-        return premiseMapper.toPremiseDto(premiseRepository.save(premise));
-    }
 
     @Override
     public List<PremiseDto> findAll(PageRequest pageRequest) {
@@ -131,17 +104,5 @@ public class PremiseServiceImpl implements PremiseService {
         return premiseMapper.toPremiseDto(premiseRepository.save(premise));
     }
 
-    private User checkAndGetOwner(Premise premise) {
-        User owner = authService.getUser();
 
-        if(!Objects.equals(owner.getRole(), UserRole.OWNER)) {
-            owner = owner.getOwner();
-        }
-
-        if(!Objects.equals(premise.getOwner(), owner)) {
-            log.warn("This premise does not match with owner's premise");
-            throw new DoesNotMatchException("Premise does not match with owner's premise");
-        }
-        return owner;
-    }
 }

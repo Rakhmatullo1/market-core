@@ -2,9 +2,11 @@ package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
+import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,6 +25,8 @@ public interface ProductService {
 
     MessageDto deleteProduct(Long id);
 
+    MessageDto convertXLSFile2Products(MultipartFile file);
+
     Product toProduct(Long id);
 
     void addProduct2Category( Product product);
@@ -30,4 +34,6 @@ public interface ProductService {
     void removeProductsFromPremise(Product product);
 
     void removeProductFromCategory( Product product);
+
+    PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto);
 }

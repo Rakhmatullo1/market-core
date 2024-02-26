@@ -11,18 +11,27 @@ import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
+import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
+import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
+import com.rahmatullo.comfortmarket.service.exception.ExistsException;
+import com.rahmatullo.comfortmarket.service.exception.FileUploadException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.CategoryMapper;
+import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
+import com.rahmatullo.comfortmarket.service.utils.ExcelUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -35,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
     private final PremiseRepository premiseRepository;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
+    private final PremiseMapper premiseMapper;
     private final CategoryService categoryService;
     private final AuthService authService;
 
@@ -73,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto updateProduct(Long id, ProductRequestDto productRequestDto) {
         log.warn("Requested to update product with id {}", id);
-        Product product = toProduct(id);
+        Product product = toProduct(id, checkAnGetOwner());
 
         if(!Objects.equals(product.getCategory().getId(), productRequestDto.getCategoryId())){
             removeProductFromCategory(product);
@@ -91,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto transfersProduct(Long id, Long premiseId) {
         log.info("Requested to transfer products to premise {}", premiseId);
-        Product product = toProduct(id);
+        Product product = toProduct(id, checkAnGetOwner());
 
         Premise premise = toPremise(premiseId);
 
@@ -109,13 +119,42 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public MessageDto deleteProduct(Long id) {
         log.info("Requested to delete product {}", id);
-        Product product = toProduct(id);
+        User owner = checkAnGetOwner();
+        Product product = toProduct(id, owner);
 
         removeProductFromCategory( product);
         removeProductsFromPremise(product);
         productRepository.delete(product);
         log.info("Successfully deleted");
         return new MessageDto("Successfully deleted");
+    }
+
+    @Override
+    public MessageDto convertXLSFile2Products(MultipartFile file) {
+        log.info("Requested to convert xsl file to database");
+        if(Objects.isNull(file)|| file.isEmpty()) {
+            log.warn("file is null or empty ");
+            throw new FileUploadException("File empty or null");
+        }
+
+        if(!ExcelUtils.hasExcelFormat(file)) {
+            log.warn("Content type does not match with excel file");
+            throw new DoesNotMatchException("Content type does not match with excel file");
+        }
+
+        try {
+            Map<Integer, List<ProductRequestDto>> products = ExcelUtils.excelToProducts(file.getInputStream());
+
+            products.keySet().forEach(productKey->{
+                products.get(productKey).forEach(product->{
+                    addProductsToPremise(Long.valueOf(productKey), product);
+                });
+            });
+
+            return new MessageDto("Successfully fetched all data");
+        } catch (IOException e) {
+            throw new FileUploadException(e.getMessage());
+        }
     }
 
     private List<ProductDto> getProducts(List<Product> products) {
@@ -163,6 +202,46 @@ public class ProductServiceImpl implements ProductService {
         log.info("Successfully deleted");
     }
 
+    @Override
+    public PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto) {
+        log.info("Requested to add new products to premise {}", id);
+        Premise premise = toPremise(id);
+
+        Product product = productMapper.toProduct(productRequestDto,premise, authService.getUser());
+
+        if(productRepository.existsByBarcode(productRequestDto.getBarcode())){
+            log.warn("the product exists");
+            throw new ExistsException("The product exists "+ productRequestDto.getBarcode());
+        }
+
+        User owner = checkAndGetOwner(premise);
+
+        product.setOwner(owner);
+        product = productRepository.save(product);
+
+        addProduct2Category( product);
+
+        List<Product> productList = premise.getProducts();
+        productList.add(product);
+        premise.setProducts(productList);
+
+        return premiseMapper.toPremiseDto(premiseRepository.save(premise));
+    }
+
+    private User checkAndGetOwner(Premise premise) {
+        User owner = authService.getUser();
+
+        if(!Objects.equals(owner.getRole(), UserRole.OWNER)) {
+            owner = owner.getOwner();
+        }
+
+        if(!Objects.equals(premise.getOwner(), owner)) {
+            log.warn("This premise does not match with owner's premise");
+            throw new DoesNotMatchException("Premise does not match with owner's premise");
+        }
+        return owner;
+    }
+
     public Premise toPremise(Long id) {
         return premiseRepository.findById(id).orElseThrow(()->{
             log.warn("premise is not found");
@@ -171,11 +250,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private User checkAnGetOwner() {
-        User owner = authService.getUser();
+        return authService.getOwner();
+    }
 
-        if(!Objects.equals(owner.getRole(), UserRole.OWNER)){
-            owner = owner.getOwner();
-        }
-        return owner;
+    private Product toProduct(Long id, User owner) {
+        return productRepository.findByIdAndOwner(id, owner).orElseThrow(()->new NotFoundException("the product has not found"));
     }
 }
