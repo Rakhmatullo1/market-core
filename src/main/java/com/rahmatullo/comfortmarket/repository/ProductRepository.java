@@ -4,21 +4,22 @@ import com.rahmatullo.comfortmarket.entity.Category;
 import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByBarcode(String barcode);
 
-    List<Product> getAllByOwner(User user);
+    Page<Product> getAllByOwner(User user, Pageable pageable);
 
-    List<Product> getAllByCategoryAndOwner(Category category, User owner);
+    Page<Product> getAllByCategoryAndOwner(Category category, User owner, Pageable pageable);
 
-    List<Product> getAllByPremise(Premise premise);
+    Page<Product> getAllByPremise(Premise premise, Pageable pageable);
 
     Optional<Product> findByIdAndOwner(Long id, User owner);
 }

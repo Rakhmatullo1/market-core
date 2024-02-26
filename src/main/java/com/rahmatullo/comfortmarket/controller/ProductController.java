@@ -8,6 +8,7 @@ import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,18 +25,18 @@ public class ProductController {
     private final FileService fileService;
 
     @GetMapping("/by-category/{id}")
-    public ResponseEntity<List<ProductDto>> getProductsCategory(@PathVariable Long id ) {
-        return ResponseEntity.ok(productService.getProductsByCategoryId(id));
+    public ResponseEntity<List<ProductDto>> getProductsCategory(@PathVariable Long id, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size ) {
+        return ResponseEntity.ok(productService.getProductsByCategoryId(id, PageRequest.of(page, size)));
     }
 
     @GetMapping("/by-premise/{id}")
-    public ResponseEntity<List<ProductDto>> getProductsPremise(@PathVariable Long id ) {
-        return ResponseEntity.ok(productService.getProductsByPremiseId(id));
+    public ResponseEntity<List<ProductDto>> getProductsPremise(@PathVariable Long id, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size ) {
+        return ResponseEntity.ok(productService.getProductsByPremiseId(id, PageRequest.of(page, size)));
     }
 
     @GetMapping()
-    public ResponseEntity<List<ProductDto>> getProductsPremise() {
-        return ResponseEntity.ok(productService.getProductByOwner());
+    public ResponseEntity<List<ProductDto>> getProductsPremise(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(productService.getProductByOwner(PageRequest.of(page, size)));
     }
 
     @GetMapping("/{id}")

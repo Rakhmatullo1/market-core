@@ -1,7 +1,7 @@
 package com.rahmatullo.comfortmarket.config;
 
 import com.rahmatullo.comfortmarket.service.JwtService;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -70,7 +70,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
             }
             filterChain.doFilter(request, response);
-        } catch (ExpiredJwtException ex) {
+        } catch (JwtException ex) {
             handleException(response, HttpStatus.UNAUTHORIZED, ex.getMessage());
         }
     }

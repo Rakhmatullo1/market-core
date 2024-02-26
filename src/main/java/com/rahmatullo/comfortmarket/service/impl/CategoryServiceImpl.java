@@ -10,6 +10,7 @@ import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,9 +38,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> findAllCategory() {
+    public List<CategoryDto> findAllCategory(PageRequest pageRequest) {
         return categoryRepository
-                .findAll()
+                .findAll(pageRequest)
                 .stream()
                 .map(categoryMapper::toCategoryDto)
                 .toList();

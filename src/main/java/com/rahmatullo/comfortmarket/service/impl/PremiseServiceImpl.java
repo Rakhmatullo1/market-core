@@ -21,6 +21,7 @@ import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -91,11 +92,10 @@ public class PremiseServiceImpl implements PremiseService {
     }
 
     @Override
-    public List<PremiseDto> findAll() {
+    public List<PremiseDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all premises");
-        User user = authService.getUser();
-        return user.getPremise()
-                .stream()
+        User user = authService.getOwner();
+        return premiseRepository.findAllByOwner(user, pageRequest)
                 .map(premiseMapper::toPremiseDto).toList();
     }
 

@@ -2,6 +2,7 @@ package com.rahmatullo.comfortmarket.service.exception;
 
 import com.rahmatullo.comfortmarket.service.dto.ErrorDto;
 import com.rahmatullo.comfortmarket.service.dto.ErrorResponseValidation;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,12 @@ public class GlobalException {
     public ResponseEntity<ErrorDto> missingServletRequestParameterExceptionHandler(MissingServletRequestParameterException ex) {
         return handler(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDto> malformedJwtExceptionHandler(MalformedJwtException ex) {
+        return handler(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseValidation> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException ex) {

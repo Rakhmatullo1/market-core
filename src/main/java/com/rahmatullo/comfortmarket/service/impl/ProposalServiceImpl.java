@@ -16,6 +16,7 @@ import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.ProposalMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,12 +41,12 @@ public class ProposalServiceImpl implements ProposalService {
     }
 
     @Override
-    public List<ProposalDto> findAll() {
+    public List<ProposalDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all proposal");
         User user = authService.getOwner();
 
         return proposalRepository.
-                findByToUser(user)
+                findByToUser(user, pageRequest)
                 .stream()
                 .map(proposalMapper::toProposalDto).toList();
     }

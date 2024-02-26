@@ -14,6 +14,8 @@ import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,11 +33,11 @@ public class UserServiceImpl implements UserService {
     private final PremiseMapper premiseMapper;
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all users");
         User user = authService.getUser();
 
-        List<User> users = findUsers(user.getRole());
+        List<User> users = findUsers(user.getRole(), pageRequest);
         return users.stream().map(u->{
             UserDto userDto = userMapper.toUserDto(u);
                     userDto.setPremise(null);
@@ -121,7 +123,7 @@ public class UserServiceImpl implements UserService {
     public void checkUser(User userResult) {
         User user = authService.getUser();
 
-        List<User> users = findUsers(user.getRole());
+        List<User> users = findUsers(user.getRole(), Pageable.unpaged());
 
         if( !users.contains(userResult)){
             log.warn("the User is not found or null");
@@ -129,11 +131,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private List<User> findUsers(UserRole role) {
+    private List<User> findUsers(UserRole role, Pageable pageRequest) {
         if(Objects.equals(role, UserRole.ADMIN)) {
-            return  userRepository.findByRoleIn(List.of(UserRole.WORKER.name(), UserRole.OWNER.name()));
+            return  userRepository.findByRoleIn(List.of(UserRole.WORKER.name(), UserRole.OWNER.name()), pageRequest).getContent();
         }
-        return userRepository.findByRoleIn(List.of(UserRole.WORKER.name()));
+        return userRepository.findByRoleIn(List.of(UserRole.WORKER.name()), pageRequest).getContent();
     }
 
     public void addUsers2Premise(User user, Premise premise) {

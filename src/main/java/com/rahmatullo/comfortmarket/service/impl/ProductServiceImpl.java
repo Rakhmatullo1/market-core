@@ -19,6 +19,7 @@ import com.rahmatullo.comfortmarket.service.mapper.CategoryMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,26 +39,26 @@ public class ProductServiceImpl implements ProductService {
     private final AuthService authService;
 
     @Override
-    public List<ProductDto> getProductsByCategoryId(Long categoryId) {
+    public List<ProductDto> getProductsByCategoryId(Long categoryId, PageRequest pageRequest) {
         log.info("Requested to get all products by category");
         Category category = categoryService.toCategory(categoryId);
 
         User owner = checkAnGetOwner();
 
         log.info("Successfully fetched all product which are belonged to {} {}", owner.getUsername(), owner.getRole());
-        return getProducts(productRepository.getAllByCategoryAndOwner(category, owner));
+        return getProducts(productRepository.getAllByCategoryAndOwner(category, owner, pageRequest).getContent());
     }
 
     @Override
-    public List<ProductDto> getProductsByPremiseId(Long premiseId) {
+    public List<ProductDto> getProductsByPremiseId(Long premiseId, PageRequest pageRequest) {
         log.info("Requested to get products by premise {}", premiseId);
         Premise premise = toPremise(premiseId);
-        return getProducts(productRepository.getAllByPremise(premise));
+        return getProducts(productRepository.getAllByPremise(premise, pageRequest).getContent());
     }
 
     @Override
-    public List<ProductDto> getProductByOwner() {
-        return getProducts(productRepository.getAllByOwner(checkAnGetOwner()));
+    public List<ProductDto> getProductByOwner(PageRequest pageRequest) {
+        return getProducts(productRepository.getAllByOwner(checkAnGetOwner(), pageRequest).getContent());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.rahmatullo.comfortmarket.service.dto.ProposalDto;
 import com.rahmatullo.comfortmarket.service.dto.ProposalRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +24,8 @@ public class ProposalController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProposalDto>> findAll() {
-        return ResponseEntity.ok(proposalService.findAll());
+    public ResponseEntity<List<ProposalDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(proposalService.findAll(PageRequest.of(page, size)));
     }
 
     @GetMapping("/{id}")
