@@ -37,4 +37,10 @@ public class PremiseController {
     public ResponseEntity<List<PremiseDto>> findAll(){
         return ResponseEntity.ok(premiseService.findAll());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PremiseDto> updatePremise(@PathVariable Long id,@Valid @RequestBody PremiseRequestDto premiseRequestDto) {
+        return ResponseEntity.ok(premiseService.updatePremise(id, premiseRequestDto));
+    }
+
 }

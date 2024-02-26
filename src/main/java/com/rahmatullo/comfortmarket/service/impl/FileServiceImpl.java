@@ -2,6 +2,7 @@ package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.config.StorageProperties;
 import com.rahmatullo.comfortmarket.entity.Product;
+import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.service.FileService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
@@ -41,11 +42,13 @@ public class FileServiceImpl implements FileService {
     private final ProductService productService;
     private final Path photoLocation;
     private final ProductMapper productMapper;
+    private final ProductRepository productRepository;
 
-    public FileServiceImpl(ProductService productService, StorageProperties properties, ProductMapper productMapper) {
+    public FileServiceImpl(ProductService productService, StorageProperties properties, ProductMapper productMapper, ProductRepository productRepository) {
         this.productService = productService;
         photoLocation = Paths.get(properties.getPhotoLocation());
         this.productMapper = productMapper;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class FileServiceImpl implements FileService {
         product.setUrl(String.format(HOST_PHOTO, address, product.getId()+product.getBarcode(), getSuffix(file.getContentType())));
 
         log.info("Successfully uploaded and saved to product");
-        return productMapper.toProductDto(product);
+        return productMapper.toProductDto(productRepository.save(product));
     }
 
     @Override

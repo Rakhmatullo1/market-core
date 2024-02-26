@@ -59,6 +59,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, productRequestDto));
     }
 
+    @PutMapping("/transfer/all/{id}/to/{premiseId}")
+    public ResponseEntity<ProductDto> transferProduct(@PathVariable Long id, @PathVariable Long premiseId) {
+        return ResponseEntity.ok(productService.transfersProduct(id, premiseId));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id){
         return ResponseEntity.ok(productService.deleteProduct(id));

@@ -17,4 +17,6 @@ public interface PremiseService {
     PremiseDto addWorkers2Premise(Long id, Long userId);
 
     Premise toPremise(Long id);
+
+    PremiseDto updatePremise(Long id, PremiseRequestDto premiseRequestDto);
 }

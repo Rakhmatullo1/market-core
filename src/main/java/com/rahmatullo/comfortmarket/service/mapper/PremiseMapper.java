@@ -35,6 +35,15 @@ public abstract class PremiseMapper {
     @Mapping(target = "products", source = "products", qualifiedByName = "getProducts")
     public abstract PremiseDto toPremiseDto(Premise premise);
 
+    @Mapping(target = "workers", source = "premise.workers")
+    @Mapping(target = "owner",source = "premise.owner")
+    @Mapping(target = "products", source = "premise.products")
+    @Mapping(target = "id", source = "premise.id")
+    @Mapping(target = "name", source = "premiseRequestDto.name")
+    @Mapping(target = "address", source = "premiseRequestDto.address")
+    @Mapping(target = "type", source = "premiseRequestDto.type")
+    public abstract Premise toPremise(PremiseRequestDto premiseRequestDto, Premise premise);
+
     @Mapping(target = "workers", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "products", ignore = true)

@@ -22,13 +22,28 @@ public abstract class UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", source = "role")
+    @Mapping(target = "authorities", ignore = true)
     public abstract User toUser(RegisterRequestDto requestDto);
+
+//    @Mapping(target = "owner", source = "user.owner")
+//    @Mapping(target = "workers", source = "user.workers")
+//    @Mapping(target = "premise", source = "user.premise")
+//    @Mapping(target = "enabled", source = "user.enabled")
+//    @Mapping(target = "password", source = "user.password")
+//    @Mapping(target = "id", source = "user.id")
+//    @Mapping(target = "role", source = "user.role")
+//    @Mapping(target = "fullName", source = "requestDto.fullName")
+//    @Mapping(target = "username", source = "requestDto.username")
+//    @Mapping(target = "phoneNumber", source = "requestDto.phoneNumber")
+//    @Mapping(target = "authorities", ignore = true)
+//    public abstract User toUser(UserRequestDto requestDto, User user);
 
     @Mapping(target = "premise", source = "premise", qualifiedByName = "getPremise")
     public abstract UserDto toUserDto(User user);
 
-    @Mapping(target = "premise", ignore = true)
+    @Mapping(target = "premises", ignore = true)
     @Mapping(target = "workers", ignore = true)
+    @Mapping(target = "premise", ignore = true)
     public abstract UserDtoForOwner toUserDtoForOwner(User user);
 
     @Named("getPremise")

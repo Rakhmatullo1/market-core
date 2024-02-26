@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
 
-    <changeSet id="1" author="Raxmatullo" runAlways="true"  >
+    <changeSet id="1" author="Raxmatullo"  >
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="product_proposal" columnName="to_user_id"/>
@@ -15,7 +15,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet id="2" author="Raxmatullo" runAlways="true" >
+    <changeSet id="2" author="Raxmatullo" >
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="fk_user_id"/>

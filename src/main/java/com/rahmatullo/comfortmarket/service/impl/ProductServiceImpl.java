@@ -88,6 +88,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductDto transfersProduct(Long id, Long premiseId) {
+        log.info("Requested to transfer products to premise {}", premiseId);
+        Product product = toProduct(id);
+
+        Premise premise = toPremise(premiseId);
+
+        removeProductsFromPremise(product);
+        product.setPremise(premise);
+
+        List<Product> productList = premise.getProducts();
+        productList.add(product);
+        premise.setProducts(productList);
+
+        premiseRepository.save(premise);
+        return productMapper.toProductDto(productRepository.save(product));
+    }
+
+    @Override
     public MessageDto deleteProduct(Long id) {
         log.info("Requested to delete product {}", id);
         Product product = toProduct(id);
@@ -120,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void removeProductsFromPremise(Product product) {
-        log.info("Requested to remove product  {}  from {}", product, product.getPremise().getId());
+        log.info("Requested to remove product  {}  from {}", product.getName(), product.getPremise().getId());
         Premise premise = toPremise(product.getPremise().getId());
 
         List<Product> products = premise.getProducts();

@@ -6,9 +6,7 @@ import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.UserRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.UserService;
-import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
-import com.rahmatullo.comfortmarket.service.dto.UserDto;
-import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
+import com.rahmatullo.comfortmarket.service.dto.*;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -79,6 +77,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto updateProfile(UserRequestDto requestDto) {
+        User user = authService.getUser();
+        return null;
+    }
+
+    @Override
     public UserDtoForOwner getUserInfo() {
         log.info("Requested to get user info");
 
@@ -109,7 +113,7 @@ public class UserServiceImpl implements UserService {
     private User getUser(Long id) {
        return userRepository.findById(id).orElseThrow(()->{
             log.warn("User is not found");
-            throw new RuntimeException("user is not found "+id);
+            throw new NotFoundException("user is not found "+id);
         });
     }
 

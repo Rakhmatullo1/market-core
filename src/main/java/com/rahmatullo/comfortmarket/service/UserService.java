@@ -4,6 +4,7 @@ import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
+import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface UserService {
     UserDto markUserAsEnabled(Long id, Long premiseId);
 
     UserDtoForOwner getUserInfo();
+
+    UserDto updateProfile(UserRequestDto requestDto);
 
     void checkUser(User userResult);
 

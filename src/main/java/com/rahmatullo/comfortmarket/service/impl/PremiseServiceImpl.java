@@ -122,6 +122,15 @@ public class PremiseServiceImpl implements PremiseService {
         });
     }
 
+    @Override
+    public PremiseDto updatePremise(Long id, PremiseRequestDto premiseRequestDto) {
+        log.info("Requested to update premise");
+        Premise premise = toPremise(id);
+        premise = premiseMapper.toPremise(premiseRequestDto, premise);
+        log.info("Successfully updated");
+        return premiseMapper.toPremiseDto(premiseRepository.save(premise));
+    }
+
     private User checkAndGetOwner(Premise premise) {
         User owner = authService.getUser();
 

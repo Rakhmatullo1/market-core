@@ -18,6 +18,8 @@ public interface ProductService {
 
     ProductDto updateProduct(Long id, ProductRequestDto productRequestDto);
 
+    ProductDto transfersProduct(Long id, Long premiseId);
+
     MessageDto deleteProduct(Long id);
 
     Product toProduct(Long id);
