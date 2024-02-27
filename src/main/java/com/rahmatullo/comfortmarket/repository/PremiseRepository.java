@@ -7,9 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PremiseRepository extends JpaRepository<Premise, Long> {
     boolean existsByOwnerAndId(User owner, Long id);
 
     Page<Premise> findAllByOwner(User user, Pageable pageable);
+
+    Optional<Premise> findByOwnerAndId(User user, Long id);
 }

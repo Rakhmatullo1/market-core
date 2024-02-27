@@ -1,6 +1,7 @@
 package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.entity.Premise;
+import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
@@ -9,18 +10,19 @@ import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.UserService;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
-import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,9 +36,8 @@ public class PremiseServiceImpl implements PremiseService {
     private final ProductRepository productRepository;
     private final PremiseMapper premiseMapper;
     private final AuthService authService;
-    private final ProductMapper productMapper;
-    private final ProductService productService;
     private final UserService userService;
+    private final ProductService productService;
 
     @Override
     public PremiseDto createPremise(PremiseRequestDto premiseRequestDto) {
@@ -62,8 +63,6 @@ public class PremiseServiceImpl implements PremiseService {
         return premiseMapper.toPremiseDto(premise);
     }
 
-
-
     @Override
     public List<PremiseDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all premises");
@@ -75,7 +74,7 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public PremiseDto addWorkers2Premise(Long id, Long userId) {
         log.info("Requested to add worker {} to premise {}", userId, id);
-        Premise premise = toPremise(id);
+        Premise premise = toPremise(id, authService.getOwner());
 
         User worker = userService.toUser(userId);
 
@@ -88,21 +87,63 @@ public class PremiseServiceImpl implements PremiseService {
     }
 
     @Override
-    public Premise toPremise(Long id) {
-        return premiseRepository.findById(id).orElseThrow(()->{
+    public PremiseDto findById(Long id) {
+        return premiseMapper.toPremiseDto(toPremise(id, authService.getOwner()));
+    }
+
+    @Override
+    public Premise toPremise(Long id, User user) {
+        return premiseRepository.findByOwnerAndId(user, id).orElseThrow(()->{
             log.warn("premise is not found");
-            throw new NotFoundException("Premise is not found");
+            throw new NotFoundException("Premise is not found " + id);
         });
     }
 
     @Override
     public PremiseDto updatePremise(Long id, PremiseRequestDto premiseRequestDto) {
         log.info("Requested to update premise");
-        Premise premise = toPremise(id);
+        Premise premise = toPremise(id, authService.getOwner());
         premise = premiseMapper.toPremise(premiseRequestDto, premise);
         log.info("Successfully updated");
         return premiseMapper.toPremiseDto(premiseRepository.save(premise));
     }
 
+    @Override
+    public MessageDto deletePremise(Long id, Long destinationPremiseId) {
+        log.info("Requested to delete premise id {}", id);
+        User owner = authService.getOwner();
 
+        if(Objects.equals(id, destinationPremiseId)) {
+            log.warn("destination premise and the premise cannot be same");
+            throw new DoesNotMatchException("destination premise and the premise cannot be same");
+        }
+
+        Premise premise = toPremise(id, owner);
+        Premise destinationPremise = toPremise(destinationPremiseId, authService.getOwner());
+
+        for (User worker : premise.getWorkers()) {
+            List<Premise> premises = worker.getPremise();
+            premises.remove(premise);
+            worker.setPremise(premises);
+            userRepository.save(worker);
+        }
+
+        List<Product> temp = new ArrayList<>(premise.getProducts());
+
+        premise.setProducts(new ArrayList<>());
+        premiseRepository.save(premise);
+
+        temp.forEach(product -> {
+            product.setPremise(destinationPremise);
+            productRepository.save(product);
+        });
+
+        List<Product> products = destinationPremise.getProducts();
+        products.addAll(temp);
+        destinationPremise.setProducts(products);
+
+        premiseRepository.save(destinationPremise);
+        premiseRepository.delete(premise);
+        return new MessageDto("Successfully deleted and transferred to another premise");
+    }
 }

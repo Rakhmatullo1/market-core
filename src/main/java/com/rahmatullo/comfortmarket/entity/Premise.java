@@ -14,7 +14,6 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Premise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

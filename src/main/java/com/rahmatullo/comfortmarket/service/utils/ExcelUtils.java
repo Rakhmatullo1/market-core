@@ -23,7 +23,7 @@ public class ExcelUtils {
 
 
     public static boolean hasExcelFormat(MultipartFile file) {
-        return !Objects.equals(file.getContentType(), TYPE);
+        return Objects.equals(file.getContentType(), TYPE);
     }
 
     public static Map<Integer, List<ProductRequestDto>> excelToProducts(InputStream is) {

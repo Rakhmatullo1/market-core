@@ -2,6 +2,7 @@ package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.ProductService;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
@@ -41,9 +42,18 @@ public class PremiseController {
         return ResponseEntity.ok(premiseService.findAll(PageRequest.of(page, size)));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PremiseDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(premiseService.findById(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<PremiseDto> updatePremise(@PathVariable Long id,@Valid @RequestBody PremiseRequestDto premiseRequestDto) {
         return ResponseEntity.ok(premiseService.updatePremise(id, premiseRequestDto));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageDto> deletePremise(@PathVariable Long id, @RequestParam Long destination ) {
+        return ResponseEntity.ok(premiseService.deletePremise(id, destination));
+    }
 }

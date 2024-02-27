@@ -6,6 +6,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -68,6 +69,10 @@ public class GlobalException {
         return handler(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorDto> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException ex) {
+        return handler(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseValidation> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException ex) {

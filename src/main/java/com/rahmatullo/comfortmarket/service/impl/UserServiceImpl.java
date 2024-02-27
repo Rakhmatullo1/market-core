@@ -68,9 +68,9 @@ public class UserServiceImpl implements UserService {
         }
 
         checkUser(user);
-        checkPremise(premiseId, user);
+        checkPremise(premiseId, owner);
 
-        Premise premise = premiseRepository.findById(premiseId).orElseThrow(()->new NotFoundException("Premise is not found"));
+        Premise premise = premiseRepository.findByOwnerAndId(owner, premiseId).orElseThrow(()->new NotFoundException("Premise is not found"));
 
         addUsers2Premise(user,premise);
         user.setOwner(owner);
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkPremise(Long id, User owner) {
-        if(premiseRepository.existsByOwnerAndId(owner, id)){
+        if(!premiseRepository.existsByOwnerAndId(owner, id)){
             log.warn("Premise is not belonged to you");
             throw new DoesNotMatchException("Premise is not belonged to you");
         }
