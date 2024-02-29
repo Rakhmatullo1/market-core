@@ -1,6 +1,7 @@
 package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.Product;
+import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
@@ -19,21 +20,15 @@ public interface ProductService {
 
     ProductDto getById(Long id);
 
+    MessageDto convertXLSFile2Products(MultipartFile file);
+
+    PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto);
+
     ProductDto updateProduct(Long id, ProductRequestDto productRequestDto);
 
     ProductDto transfersProduct(Long id, Long premiseId);
 
     MessageDto deleteProduct(Long id);
 
-    MessageDto convertXLSFile2Products(MultipartFile file);
-
-    Product toProduct(Long id);
-
-    void addProduct2Category( Product product);
-
-    void removeProductsFromPremise(Product product);
-
-    void removeProductFromCategory( Product product);
-
-    PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto);
+    Product toProduct(Long id, User owner);
 }

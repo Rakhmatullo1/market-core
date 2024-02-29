@@ -8,7 +8,6 @@ import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.repository.UserRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.PremiseService;
-import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
@@ -37,7 +36,19 @@ public class PremiseServiceImpl implements PremiseService {
     private final PremiseMapper premiseMapper;
     private final AuthService authService;
     private final UserService userService;
-    private final ProductService productService;
+
+    @Override
+    public List<PremiseDto> findAll(PageRequest pageRequest) {
+        log.info("Requested to get all premises");
+        User user = authService.getOwner();
+        return premiseRepository.findAllByOwner(user, pageRequest)
+                .map(premiseMapper::toPremiseDto).toList();
+    }
+
+    @Override
+    public PremiseDto findById(Long id) {
+        return premiseMapper.toPremiseDto(toPremise(id, authService.getOwner()));
+    }
 
     @Override
     public PremiseDto createPremise(PremiseRequestDto premiseRequestDto) {
@@ -54,21 +65,11 @@ public class PremiseServiceImpl implements PremiseService {
         premise.setOwner(ownerUser);
         premise = premiseRepository.save(premise);
 
-        List<Premise> premises = ownerUser.getPremise();
-        premises.add(premise);
-        ownerUser.setPremise(premises);
+        ownerUser.getPremise().add(premise);
         userRepository.save(ownerUser);
 
         log.info("Successfully added new premise [{}]", premiseRequestDto);
         return premiseMapper.toPremiseDto(premise);
-    }
-
-    @Override
-    public List<PremiseDto> findAll(PageRequest pageRequest) {
-        log.info("Requested to get all premises");
-        User user = authService.getOwner();
-        return premiseRepository.findAllByOwner(user, pageRequest)
-                .map(premiseMapper::toPremiseDto).toList();
     }
 
     @Override
@@ -79,24 +80,11 @@ public class PremiseServiceImpl implements PremiseService {
         User worker = userService.toUser(userId);
 
         userService.checkUser(worker);
-        userService.addUsers2Premise(worker, premise);
+        worker.getPremise().add(premise);
 
         userRepository.save(worker);
         log.info("Successfully saved user to premise ");
         return premiseMapper.toPremiseDto(premise);
-    }
-
-    @Override
-    public PremiseDto findById(Long id) {
-        return premiseMapper.toPremiseDto(toPremise(id, authService.getOwner()));
-    }
-
-    @Override
-    public Premise toPremise(Long id, User user) {
-        return premiseRepository.findByOwnerAndId(user, id).orElseThrow(()->{
-            log.warn("premise is not found");
-            throw new NotFoundException("Premise is not found " + id);
-        });
     }
 
     @Override
@@ -111,20 +99,25 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public MessageDto deletePremise(Long id, Long destinationPremiseId) {
         log.info("Requested to delete premise id {}", id);
-        User owner = authService.getOwner();
+        User user = authService.getUser();
+
+        if(!Objects.equals(user.getRole(), UserRole.OWNER)) {
+            log.warn("user role {}", user.getRole().name());
+            throw new DoesNotMatchException("Your role does not match with any authorities");
+        }
+
+        user = authService.getOwner();
 
         if(Objects.equals(id, destinationPremiseId)) {
             log.warn("destination premise and the premise cannot be same");
             throw new DoesNotMatchException("destination premise and the premise cannot be same");
         }
 
-        Premise premise = toPremise(id, owner);
-        Premise destinationPremise = toPremise(destinationPremiseId, authService.getOwner());
+        Premise premise = toPremise(id, user);
+        Premise destinationPremise = toPremise(destinationPremiseId,user);
 
         for (User worker : premise.getWorkers()) {
-            List<Premise> premises = worker.getPremise();
-            premises.remove(premise);
-            worker.setPremise(premises);
+            worker.getPremise().remove(premise);
             userRepository.save(worker);
         }
 
@@ -145,5 +138,12 @@ public class PremiseServiceImpl implements PremiseService {
         premiseRepository.save(destinationPremise);
         premiseRepository.delete(premise);
         return new MessageDto("Successfully deleted and transferred to another premise");
+    }
+
+    private Premise toPremise(Long id, User user) {
+        return premiseRepository.findByOwnerAndId(user, id).orElseThrow(()->{
+            log.warn("premise is not found");
+            throw new NotFoundException("Premise is not found " + id);
+        });
     }
 }

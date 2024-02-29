@@ -44,7 +44,6 @@ public class ProposalServiceImpl implements ProposalService {
     public List<ProposalDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all proposal");
         User user = authService.getOwner();
-
         return proposalRepository.
                 findByToUser(user, pageRequest)
                 .stream()

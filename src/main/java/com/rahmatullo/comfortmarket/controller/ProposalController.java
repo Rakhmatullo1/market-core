@@ -23,6 +23,11 @@ public class ProposalController {
         return ResponseEntity.ok(proposalService.create(requestDto));
     }
 
+    @PostMapping("/decision/{id}")
+    public ResponseEntity<ProposalDto> approveOrReject(@PathVariable Long id, @RequestParam boolean isApproved){
+        return ResponseEntity.ok(proposalService.approveOrReject(id, isApproved));
+    }
+
     @GetMapping
     public ResponseEntity<List<ProposalDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(proposalService.findAll(PageRequest.of(page, size)));
@@ -31,11 +36,6 @@ public class ProposalController {
     @GetMapping("/{id}")
     public ResponseEntity<ProposalDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(proposalService.findById(id));
-    }
-
-    @PostMapping("/decision/{id}")
-    public ResponseEntity<ProposalDto> approveOrReject(@PathVariable Long id, @RequestParam boolean isApproved){
-        return ResponseEntity.ok(proposalService.approveOrReject(id, isApproved));
     }
 
     @PutMapping("/{id}")

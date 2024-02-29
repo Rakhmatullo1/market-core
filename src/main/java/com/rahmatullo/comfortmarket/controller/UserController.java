@@ -17,6 +17,11 @@ public class UserController {
 
     private final UserService userService;
 
+    @PostMapping("/{id}")
+    public ResponseEntity<UserDto> enableWorker(@PathVariable Long id, @RequestParam Long premiseId) {
+        return ResponseEntity.ok(userService.markUserAsEnabled(id, premiseId));
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDto>> findAllWorkers(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.findAll(PageRequest.of(page, size)));
@@ -25,11 +30,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findWorkerById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
-    }
-
-    @PostMapping("/{id}")
-    public ResponseEntity<UserDto> enableWorker(@PathVariable Long id, @RequestParam Long premiseId) {
-        return ResponseEntity.ok(userService.markUserAsEnabled(id, premiseId));
     }
 
     @GetMapping("/info")

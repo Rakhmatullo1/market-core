@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(r->
                         {
-                            r.requestMatchers("/auth/**").permitAll();
+                            r.requestMatchers("/auth/**", "/swagger-ui/**").permitAll();
                             r.requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority(UserRole.ADMIN.name() ,UserRole.OWNER.name(), UserRole.WORKER.name());
                             r.requestMatchers("/users/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.OWNER.name());
                             r.requestMatchers("/category/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());

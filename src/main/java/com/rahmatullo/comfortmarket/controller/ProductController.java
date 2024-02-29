@@ -55,6 +55,11 @@ public class ProductController {
         return ResponseEntity.ok(fileService.uploadPhoto2Product(id, file));
     }
 
+    @PostMapping("/upload_file/to/products")
+    public ResponseEntity<MessageDto> convertXSLFile(@RequestParam MultipartFile file) {
+        return ResponseEntity.ok(productService.convertXLSFile2Products(file));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto){
         return ResponseEntity.ok(productService.updateProduct(id, productRequestDto));
@@ -68,10 +73,5 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id){
         return ResponseEntity.ok(productService.deleteProduct(id));
-    }
-
-    @PostMapping("/upload_file/to/products")
-    public ResponseEntity<MessageDto> convertXSLFile(@RequestParam MultipartFile file) {
-        return ResponseEntity.ok(productService.convertXLSFile2Products(file));
     }
 }

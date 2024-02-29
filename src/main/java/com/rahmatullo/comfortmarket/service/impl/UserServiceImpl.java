@@ -48,40 +48,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(Long id) {
         log.info("Requested to get user {}", id);
-        User userResult = getUser(id);
+        User userResult = toUser(id);
 
         checkUser(userResult);
 
         return userMapper.toUserDto(userResult);
-    }
-
-    @Override
-    public UserDto markUserAsEnabled(Long id, Long premiseId) {
-        log.info("Requested to change status of user {}", id);
-
-        User owner = authService.getUser();
-        User user = getUser(id);
-
-        if(Objects.equals(owner.getRole(), UserRole.ADMIN)){
-            log.info("Successfully enabled by {}", owner.getRole());
-            return userMapper.toUserDto(enableUser(user));
-        }
-
-        checkUser(user);
-        checkPremise(premiseId, owner);
-
-        Premise premise = premiseRepository.findByOwnerAndId(owner, premiseId).orElseThrow(()->new NotFoundException("Premise is not found"));
-
-        addUsers2Premise(user,premise);
-        user.setOwner(owner);
-
-        return userMapper.toUserDto(enableUser(user));
-    }
-
-    @Override
-    public UserDto updateProfile(UserRequestDto requestDto) {
-        User user = authService.getUser();
-        return null;
     }
 
     @Override
@@ -100,23 +71,35 @@ public class UserServiceImpl implements UserService {
         return userDtoForOwner;
     }
 
-    private User enableUser(User user) {
-        user.setEnabled(true);
-        return  userRepository.save(user);
-    }
+    @Override
+    public UserDto markUserAsEnabled(Long id, Long premiseId) {
+        log.info("Requested to change status of user {}", id);
 
-    private void checkPremise(Long id, User owner) {
-        if(!premiseRepository.existsByOwnerAndId(owner, id)){
-            log.warn("Premise is not belonged to you");
-            throw new DoesNotMatchException("Premise is not belonged to you");
+        User owner = authService.getUser();
+        User user = toUser(id);
+
+        if(Objects.equals(owner.getRole(), UserRole.ADMIN)){
+            log.info("Successfully enabled by {}", owner.getRole());
+            return userMapper.toUserDto(enableUser(user));
         }
+
+        checkUser(user);
+        checkPremise(premiseId, owner);
+
+        Premise premise = premiseRepository
+                .findByOwnerAndId(owner, premiseId)
+                .orElseThrow(()->new NotFoundException("Premise is not found"));
+
+        user.getPremise().add(premise);
+        user.setOwner(owner);
+
+        return userMapper.toUserDto(enableUser(user));
     }
 
-    private User getUser(Long id) {
-       return userRepository.findById(id).orElseThrow(()->{
-            log.warn("User is not found");
-            throw new NotFoundException("user is not found "+id);
-        });
+    @Override
+    public UserDto updateProfile(UserRequestDto requestDto) {
+        User user = authService.getUser();
+        return null;
     }
 
     @Override
@@ -131,22 +114,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public User toUser(Long id) {
+        return userRepository.findById(id).orElseThrow(()->new NotFoundException("User is not found"));
+    }
+
     private List<User> findUsers(UserRole role, Pageable pageRequest) {
         if(Objects.equals(role, UserRole.ADMIN)) {
             return  userRepository.findByRoleIn(List.of(UserRole.WORKER.name(), UserRole.OWNER.name()), pageRequest).getContent();
         }
         return userRepository.findByRoleIn(List.of(UserRole.WORKER.name()), pageRequest).getContent();
-    }
-
-    public void addUsers2Premise(User user, Premise premise) {
-        List<Premise> premises = user.getPremise();
-        premises.add(premise);
-        user.setPremise(premises);
-    }
-
-    @Override
-    public User toUser(Long id) {
-        return userRepository.findById(id).orElseThrow(()->new NotFoundException("User is not found"));
     }
 
     private <T> List<T> getList(List<T> list) {
@@ -159,9 +136,22 @@ public class UserServiceImpl implements UserService {
     private List<PremiseDto> getPremises4Owner(User user) {
         return  user.getPremise().stream().map(premise -> {
             PremiseDto premiseDto = premiseMapper.toPremiseDto(premise);
+            premise.setProducts(getList(premise.getProducts()));
             premiseDto.setWorkers(null);
             premiseDto.setProducts(null);
             return premiseDto;
         }).toList();
+    }
+
+    private User enableUser(User user) {
+        user.setEnabled(true);
+        return  userRepository.save(user);
+    }
+
+    private void checkPremise(Long id, User owner) {
+        if(!premiseRepository.existsByOwnerAndId(owner, id)){
+            log.warn("Premise is not belonged to you");
+            throw new DoesNotMatchException("Premise is not belonged to you");
+        }
     }
 }
