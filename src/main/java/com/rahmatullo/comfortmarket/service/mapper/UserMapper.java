@@ -5,6 +5,7 @@ import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
+import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,18 +26,18 @@ public abstract class UserMapper {
     @Mapping(target = "authorities", ignore = true)
     public abstract User toUser(RegisterRequestDto requestDto);
 
-//    @Mapping(target = "owner", source = "user.owner")
-//    @Mapping(target = "workers", source = "user.workers")
-//    @Mapping(target = "premise", source = "user.premise")
-//    @Mapping(target = "enabled", source = "user.enabled")
-//    @Mapping(target = "password", source = "user.password")
-//    @Mapping(target = "id", source = "user.id")
-//    @Mapping(target = "role", source = "user.role")
-//    @Mapping(target = "fullName", source = "requestDto.fullName")
-//    @Mapping(target = "username", source = "requestDto.username")
-//    @Mapping(target = "phoneNumber", source = "requestDto.phoneNumber")
-//    @Mapping(target = "authorities", ignore = true)
-//    public abstract User toUser(UserRequestDto requestDto, User user);
+    @Mapping(target = "owner", source = "user.owner")
+    @Mapping(target = "workers", source = "user.workers")
+    @Mapping(target = "premise", source = "user.premise")
+    @Mapping(target = "enabled", source = "user.enabled")
+    @Mapping(target = "password", source = "user.password")
+    @Mapping(target = "id", source = "user.id")
+    @Mapping(target = "role", source = "user.role")
+    @Mapping(target = "fullName", source = "requestDto.fullName")
+    @Mapping(target = "username", source = "requestDto.username")
+    @Mapping(target = "phoneNumber", source = "requestDto.phoneNumber")
+    @Mapping(target = "authorities", ignore = true)
+    public abstract User toUser(UserRequestDto requestDto, User user);
 
     @Mapping(target = "premise", source = "premise", qualifiedByName = "getPremise")
     public abstract UserDto toUserDto(User user);

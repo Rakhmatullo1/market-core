@@ -5,6 +5,7 @@ import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.ProductTransferDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -61,17 +62,22 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto){
-        return ResponseEntity.ok(productService.updateProduct(id, productRequestDto));
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto, @RequestParam Long premiseId){
+        return ResponseEntity.ok(productService.updateProduct(id, productRequestDto, premiseId));
     }
 
-    @PutMapping("/transfer/all/{id}/to/{premiseId}")
-    public ResponseEntity<ProductDto> transferProduct(@PathVariable Long id, @PathVariable Long premiseId) {
-        return ResponseEntity.ok(productService.transfersProduct(id, premiseId));
+    @PutMapping("/transfer/part/{id}")
+    public ResponseEntity<ProductDto> transferProductPartly(@PathVariable Long id , @RequestBody ProductTransferDto productTransferDto) {
+        return ResponseEntity.ok(productService.transfersProductPartly(id, productTransferDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id){
+    public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id, @RequestParam Long premiseId){
+        return ResponseEntity.ok(productService.deleteProduct(id, premiseId));
+    }
+
+    @DeleteMapping("/all/{id}")
+    public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id) {
         return ResponseEntity.ok(productService.deleteProduct(id));
     }
 }

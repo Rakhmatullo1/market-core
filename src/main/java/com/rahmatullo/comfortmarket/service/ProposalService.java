@@ -13,7 +13,7 @@ public interface ProposalService {
 
      ProposalDto findById(Long id);
 
-     ProposalDto approveOrReject(Long id, boolean isApproved);
+     ProposalDto approveOrReject(Long id, boolean isApproved,  Long premiseId);
 
      ProposalDto updateProposal(Long id, ProposalRequestDto proposalRequestDto);
 }

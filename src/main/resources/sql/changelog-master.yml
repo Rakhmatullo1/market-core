@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: classpath:/sql/changes.xml
+  - include:
+      file: classpath:/sql/change-premise-products.xml
+  - include:
+      file: classpath:/sql/change-product.xml

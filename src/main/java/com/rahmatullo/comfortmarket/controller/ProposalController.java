@@ -24,8 +24,8 @@ public class ProposalController {
     }
 
     @PostMapping("/decision/{id}")
-    public ResponseEntity<ProposalDto> approveOrReject(@PathVariable Long id, @RequestParam boolean isApproved){
-        return ResponseEntity.ok(proposalService.approveOrReject(id, isApproved));
+    public ResponseEntity<ProposalDto> approveOrReject(@PathVariable Long id, @RequestParam boolean isApproved, @RequestParam Long premiseId){
+        return ResponseEntity.ok(proposalService.approveOrReject(id, isApproved, premiseId));
     }
 
     @GetMapping

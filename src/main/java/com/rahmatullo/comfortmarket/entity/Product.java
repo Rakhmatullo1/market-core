@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -18,7 +21,8 @@ public class Product {
     private String name;
     private String barcode;
     private Date createdAt;
-    private int count;
+    @ElementCollection
+    private List<String> count;
     private Double price;
     private String url;
     @ManyToOne
@@ -28,6 +32,9 @@ public class Product {
     @JoinColumn(name = "owner_id")
     private User owner;
     private String addedBy;
-    @ManyToOne
-    private Premise premise;
+    @ManyToMany
+    @JoinTable(name = "premise_products",
+            joinColumns = @JoinColumn(name = "products_id"),
+            inverseJoinColumns = @JoinColumn(name = "premise_id"))
+    private Set<Premise> premise = new HashSet<>();
 }

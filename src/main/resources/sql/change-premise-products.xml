@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="1" author="Raxmatullo" >
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="FK1eboi9sql2req9xfbjioveyfx"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="premise_products" constraintName="FK1eboi9sql2req9xfbjioveyfx"/>
+    </changeSet>
+    <changeSet id="2" author="Raxmatullo" >
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="UK_85nabx4m74xjj8yrr91v2phxq"/>
+        </preConditions>
+        <dropIndex tableName="premise_products" indexName="UK_85nabx4m74xjj8yrr91v2phxq"/>
+    </changeSet>
+    <changeSet id="3" author="Raxmatullo">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_p_id"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="premise_products" baseColumnNames="products_id" constraintName="fk_p_id" referencedTableName="product"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

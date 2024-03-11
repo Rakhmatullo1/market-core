@@ -10,10 +10,7 @@ import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.ProductService;
-import com.rahmatullo.comfortmarket.service.dto.MessageDto;
-import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.*;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
@@ -32,6 +29,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+
+import static com.rahmatullo.comfortmarket.service.mapper.ProductMapper.getFormattedString;
 
 @Service
 @Slf4j
@@ -61,7 +61,10 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getProductsByPremiseId(Long premiseId, PageRequest pageRequest) {
         log.info("Requested to get products by premise {}", premiseId);
         Premise premise = toPremise(premiseId);
-        return getProducts(productRepository.getAllByPremise(premise, pageRequest).getContent());
+        List<ProductDto> products = getProducts(productRepository.getAllByPremise(premise, pageRequest).getContent());
+        products.forEach(p->
+                p.setExtra(p.getExtra().stream().filter(e->Objects.equals(e.getPremise(), premise.getName())).toList()));
+        return products;
     }
 
     @Override
@@ -106,11 +109,9 @@ public class ProductServiceImpl implements ProductService {
         Premise premise = toPremise(id);
 
         Product product = productMapper.toProduct(productRequestDto,premise, authService.getUser());
+        product.getPremise().add(premise);
 
-        if(productRepository.existsByBarcode(productRequestDto.getBarcode())){
-            log.warn("the product exists");
-            throw new ExistsException("The product exists "+ productRequestDto.getBarcode());
-        }
+        checkProductByBarcode(productRequestDto);
 
         User owner = checkAndGetOwner(premise);
 
@@ -119,15 +120,17 @@ public class ProductServiceImpl implements ProductService {
 
         addProduct2Category( product);
 
-        premise.getProducts().add(product);
-
         return premiseMapper.toPremiseDto(premiseRepository.save(premise));
     }
 
     @Override
-    public ProductDto updateProduct(Long id, ProductRequestDto productRequestDto) {
+    public ProductDto updateProduct(Long id, ProductRequestDto productRequestDto, Long premiseId) {
         log.warn("Requested to update product with id {}", id);
         Product product = toProduct(id, authService.getOwner());
+
+        if(!Objects.equals(product.getBarcode(), productRequestDto.getBarcode())){
+            checkProductByBarcode(productRequestDto);
+        }
 
         if(!Objects.equals(product.getCategory().getId(), productRequestDto.getCategoryId())){
             removeProductFromCategory(product);
@@ -136,38 +139,57 @@ public class ProductServiceImpl implements ProductService {
             addProduct2Category( product);
         }
 
-        product = productMapper.toProduct(productRequestDto, product);
+        product = productMapper.toProduct(productRequestDto, product, premiseId);
 
         log.info("Successfully updated");
         return productMapper.toProductDto(productRepository.save(product));
     }
 
     @Override
-    public ProductDto transfersProduct(Long id, Long premiseId) {
-        log.info("Requested to transfer products to premise {}", premiseId);
-        Product product = toProduct(id, authService.getOwner());
+    public ProductDto transfersProductPartly(Long id, ProductTransferDto productTransferDto) {
+        Product product  = toProduct(id, authService.getOwner());
 
-        Premise premise = toPremise(premiseId);
+        checkProductAndPremise(product, productTransferDto.getPreviousId());
 
-        removeProductsFromPremise(product);
-        product.setPremise(premise);
+        Premise premise = toPremise(productTransferDto.getDestinationId());
+        Premise previousPremise = toPremise(productTransferDto.getPreviousId());
+
+        updateOrAddCount(product, premise, productTransferDto.getCount());
+        removeOrAddCountFromPreviousPremise(product, previousPremise, productTransferDto);
 
         premise.getProducts().add(product);
-
-        premiseRepository.save(premise);
         return productMapper.toProductDto(productRepository.save(product));
     }
 
     @Override
-    public MessageDto deleteProduct(Long id) {
+    public MessageDto deleteProduct(Long id, Long premiseId) {
         log.info("Requested to delete product {}", id);
         User owner = authService.getOwner();
         Product product = toProduct(id, owner);
 
         removeProductFromCategory( product);
-        removeProductsFromPremise(product);
-        productRepository.delete(product);
+        removeProductsFromPremise(product, premiseId);
+
+        String count = findCount(premiseId, product).orElseThrow(()->new NotFoundException("Not found product on premise"));
+        product.getCount().remove(count);
+        productRepository.save(product);
+
+        if(product.getCount().isEmpty()) {
+            productRepository.delete(product);
+        }
+
         log.info("Successfully deleted");
+        return new MessageDto("Successfully deleted");
+    }
+
+    @Override
+    public MessageDto deleteProduct(Long id) {
+        Product product = toProduct(id, authService.getOwner());
+
+        removeProductFromCategory(product);
+        product.setOwner(null);
+
+        productRepository.delete(productRepository.save(product));
         return new MessageDto("Successfully deleted");
     }
 
@@ -235,15 +257,71 @@ public class ProductServiceImpl implements ProductService {
         categoryRepository.save(category);
     }
 
-    private void removeProductsFromPremise(Product product) {
-        log.info("Requested to remove product  {}  from {}", product.getName(), product.getPremise().getId());
-        Premise premise = toPremise(product.getPremise().getId());
+    private void removeProductsFromPremise(Product product, Long id) {
+        log.info("Requested to remove product  {}  from {}", product.getName(), id);
+        Premise premise = toPremise(id);
 
-        List<Product> products = premise.getProducts();
-        products.remove(product);
-        premise.setProducts(products);
+        premise.getProducts().remove(product);
 
         premiseRepository.save(premise);
         log.info("successfully deleted");
+    }
+
+    private void checkProductByBarcode(ProductRequestDto productRequestDto) {
+        if(productRepository.existsByBarcode(productRequestDto.getBarcode())){
+            log.warn("the product exists");
+            throw new ExistsException("The product exists "+ productRequestDto.getBarcode());
+        }
+    }
+
+    private void checkProductAndPremise(Product product, Long previousPremiseId){
+        if(product.getPremise().stream().noneMatch(p->Objects.equals(p.getId(), previousPremiseId))) {
+            log.warn("Premise does not match");
+            throw new DoesNotMatchException("Previous premise id does not match");
+        }
+    }
+
+    private Optional<String> findCount(Long premiseId, Product product) {
+        return  product.getCount().stream()
+                .filter(c->Objects.equals(Long.parseLong(c.split(":")[0]), premiseId))
+                .findFirst();
+    }
+
+    private void updateOrAddCount( Product product, Premise premise, Object countOne){
+        Optional<String> countInDestinationPremise = findCount(premise.getId(), product);
+
+        if(countInDestinationPremise.isEmpty()) {
+            product.getCount().add(getFormattedString(premise, countOne));
+        }
+
+        if(countInDestinationPremise.isPresent()) {
+            String count = countInDestinationPremise.get();
+            long resultOne = Long.parseLong(count.split(":")[1]) + (long) countOne;
+            product.getCount().remove(count);
+            product.getCount().add(getFormattedString(premise, resultOne));
+            premise.getProducts().remove(product);
+        }
+    }
+
+    private void removeOrAddCountFromPreviousPremise(Product product, Premise premise,ProductTransferDto productTransferDto ) {
+        String count = findCount(premise.getId(), product)
+                .orElseThrow(()->new NotFoundException("Product is not found in premise"));
+
+        product.getCount().remove(count);
+
+        long countInPreviousPremise = Long.parseLong(count.split(":")[1]);
+
+        if(countInPreviousPremise < productTransferDto.getCount()) {
+            throw new NotFoundException("Not enough products to transfer");
+        }
+
+        Long result = countInPreviousPremise-productTransferDto.getCount();
+
+        product.getPremise().remove(premise);
+
+        if(!Objects.equals(result, 0L)) {
+            product.getCount().add(getFormattedString(premise, result));
+            product.getPremise().add(premise);
+        }
     }
 }

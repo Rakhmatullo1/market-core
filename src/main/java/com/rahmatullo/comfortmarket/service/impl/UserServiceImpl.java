@@ -9,6 +9,7 @@ import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.*;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
+import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.mapper.UserMapper;
@@ -31,6 +32,13 @@ public class UserServiceImpl implements UserService {
     private final AuthService authService;
     private final PremiseRepository premiseRepository;
     private final PremiseMapper premiseMapper;
+
+    public static  <T> List<T> getList(List<T> list) {
+        if(list.size()>3) {
+            return list.subList(0,3);
+        }
+        return list;
+    }
 
     @Override
     public List<UserDto> findAll(PageRequest pageRequest) {
@@ -98,8 +106,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateProfile(UserRequestDto requestDto) {
+        log.info("Requested to update profile");
         User user = authService.getUser();
-        return null;
+
+        if(!Objects.equals(user.getUsername(), requestDto.getUsername()) && userRepository.existsByUsername(requestDto.getUsername())) {
+           log.warn("The username exists ");
+           throw new ExistsException("Username exists " + requestDto.getUsername());
+        }
+
+        user = userMapper.toUser(requestDto, user);
+
+        log.info("Successfully updated");
+        return userMapper.toUserDto(userRepository.save(user));
+    }
+
+    @Override
+    public MessageDto delete() {
+        log.info("Requested to delete user");
+        User user = authService.getUser();
+        deleteUser(user);
+        userRepository.delete(userRepository.save(user));
+
+        log.info("Successfully deleted ");
+        return new MessageDto("Successfully deleted");
+    }
+
+    @Override
+    public MessageDto removeUser(Long id) {
+        log.info("Requested to remove User ");
+        User user = toUser(id);
+        checkUser(user);
+
+        deleteUser(user);
+        userRepository.save(user);
+
+        log.info("Successfully deleted");
+        return new MessageDto("Successfully removed");
     }
 
     @Override
@@ -126,13 +168,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByRoleIn(List.of(UserRole.WORKER.name()), pageRequest).getContent();
     }
 
-    private <T> List<T> getList(List<T> list) {
-        if(list.size()>3) {
-            return list.subList(0,3);
-        }
-        return list;
-    }
-
     private List<PremiseDto> getPremises4Owner(User user) {
         return  user.getPremise().stream().map(premise -> {
             PremiseDto premiseDto = premiseMapper.toPremiseDto(premise);
@@ -153,5 +188,15 @@ public class UserServiceImpl implements UserService {
             log.warn("Premise is not belonged to you");
             throw new DoesNotMatchException("Premise is not belonged to you");
         }
+    }
+
+    private void deleteUser(User user) {
+        user.getPremise().forEach(premise -> {
+            premise.getWorkers().remove(user);
+        });
+
+        user.setPremise(null);
+        user.setOwner(null);
+        user.setEnabled(false);
     }
 }
