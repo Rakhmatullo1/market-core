@@ -1,6 +1,7 @@
 package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.User;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
 import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
@@ -17,8 +18,11 @@ public interface UserService {
 
     UserDto markUserAsEnabled(Long id, Long premiseId);
 
-    //TODO finishing update method
     UserDto updateProfile(UserRequestDto requestDto);
+
+    MessageDto delete();
+
+    MessageDto removeUser(Long id);
 
     void checkUser(User userResult);
 

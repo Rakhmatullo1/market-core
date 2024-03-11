@@ -1,8 +1,10 @@
 package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.UserService;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
+import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +37,20 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<UserDtoForOwner> getInfo(){
         return ResponseEntity.ok(userService.getUserInfo());
+    }
+
+    @PutMapping("/func")
+    public ResponseEntity<UserDto> updateProfile(@RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userService.updateProfile(userRequestDto));
+    }
+
+    @DeleteMapping("/func")
+    public ResponseEntity<MessageDto> deleteProfile() {
+        return ResponseEntity.ok(userService.delete());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageDto> removeUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.removeUser(id));
     }
 }

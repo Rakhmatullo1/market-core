@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -127,7 +128,8 @@ public class PremiseServiceImpl implements PremiseService {
         premiseRepository.save(premise);
 
         temp.forEach(product -> {
-            product.setPremise(destinationPremise);
+            product.getPremise().remove(premise);
+            product.getPremise().add(destinationPremise);
             productRepository.save(product);
         });
 

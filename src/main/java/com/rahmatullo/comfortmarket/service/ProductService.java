@@ -2,10 +2,7 @@ package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
-import com.rahmatullo.comfortmarket.service.dto.MessageDto;
-import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +21,11 @@ public interface ProductService {
 
     PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto);
 
-    ProductDto updateProduct(Long id, ProductRequestDto productRequestDto);
+    ProductDto updateProduct(Long id, ProductRequestDto productRequestDto, Long premiseId);
 
-    ProductDto transfersProduct(Long id, Long premiseId);
+    ProductDto  transfersProductPartly(Long id, ProductTransferDto productTransferDto);
+
+    MessageDto deleteProduct(Long id, Long premiseId);
 
     MessageDto deleteProduct(Long id);
 

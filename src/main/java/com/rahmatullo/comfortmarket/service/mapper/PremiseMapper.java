@@ -8,6 +8,7 @@ import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
+import com.rahmatullo.comfortmarket.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -60,6 +61,6 @@ public abstract class PremiseMapper {
 
     @Named("getProducts")
     List<ProductDto> getProducts(List<Product> productList) {
-        return productList.stream().map(productMapper::toProductDto).toList();
+        return UserServiceImpl.getList(productList.stream().map(productMapper::toProductDto).toList());
     }
 }

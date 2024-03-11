@@ -1,8 +1,10 @@
 package com.rahmatullo.comfortmarket.service.impl;
 
+import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.ProductProposal;
 import com.rahmatullo.comfortmarket.entity.User;
+import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.repository.ProposalRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
@@ -29,6 +31,7 @@ public class ProposalServiceImpl implements ProposalService {
 
     private final ProposalRepository proposalRepository;
     private final ProductRepository productRepository;
+    private final PremiseRepository premiseRepository;
     private final ProposalMapper proposalMapper;
     private final AuthService authService;
 
@@ -61,7 +64,7 @@ public class ProposalServiceImpl implements ProposalService {
     }
 
     @Override
-    public ProposalDto approveOrReject(Long id, boolean isApproved) {
+    public ProposalDto approveOrReject(Long id, boolean isApproved, Long premiseId) {
         log.info("Requested to approve/reject proposal");
         User user = authService.getOwner();
         ProductProposal proposal = toProposal(id);
@@ -73,7 +76,9 @@ public class ProposalServiceImpl implements ProposalService {
         proposal.setStatus(isApproved ? ProposalStatus.ACCEPTED : ProposalStatus.REJECTED);
         proposal.setApprovedBy(user.getUsername());
 
-        changeOnCountOfProduct(proposal, isApproved);
+        Premise premise = premiseRepository.findByOwnerAndId(user, premiseId).orElseThrow(()->new NotFoundException("Premise is not found") );
+
+        changeOnCountOfProduct(proposal, isApproved, premise);
 
         return proposalMapper.toProposalDto(proposal);
     }
@@ -97,21 +102,31 @@ public class ProposalServiceImpl implements ProposalService {
         return proposalRepository.findById(id).orElseThrow(()->new NotFoundException("Proposal is not found"));
     }
 
-    private void changeOnCountOfProduct(ProductProposal proposal, boolean isApproved) {
+    private void changeOnCountOfProduct(ProductProposal proposal, boolean isApproved, Premise premise) {
         log.info("Requested to add/subtract on count product");
         Product product = proposal.getProduct();
-        int oldCount = product.getCount();
+
+        List<String> productCount = product.getCount();
+        String count = productCount.stream()
+                .filter(c-> Objects.equals(Long.parseLong(c.split(":")[0]), premise.getId()))
+                .findFirst()
+                .orElseThrow(()->new NotFoundException("Something went wrong with premise"));
+
+        Integer oldCount = Integer.parseInt(count.split(":")[1]);
 
         if(oldCount<proposal.getCount() && isApproved) {
             log.info("Unable to approve");
             throw new ExistsException("you cannot approve");
         }
 
-        product.setCount(isApproved ?
+        int result = isApproved ?
                 proposal.getAction() == Action.EXPORT
                         ?  (int) (oldCount - proposal.getCount())
                         : (int) (oldCount + proposal.getCount())
-                : oldCount);
+                : oldCount;
+        product.getCount().remove(count);
+
+        product.getCount().add(String.format("%s:%s", premise.getId(), result));
         productRepository.save(product);
         log.info("Successfully changed");
     }
