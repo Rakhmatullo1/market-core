@@ -7,7 +7,6 @@ import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
-import com.rahmatullo.comfortmarket.service.enums.Action4Product;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +31,7 @@ public class PremiseController {
 
     @PostMapping("/{id}/add-product")
     public ResponseEntity<PremiseDto> addProducts(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto){
-        return ResponseEntity.ok(historyService.createHistory(productService.addProductsToPremise(id, productRequestDto), Action4Product.CREATED, id));
+        return ResponseEntity.ok(productService.addProductsToPremise(id, productRequestDto));
     }
 
     @PostMapping("/{id}/add_user/{userId}")

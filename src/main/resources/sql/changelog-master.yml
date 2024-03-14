@@ -5,3 +5,5 @@ databaseChangeLog:
       file: classpath:/sql/change-premise-products.xml
   - include:
       file: classpath:/sql/change-product.xml
+  - include:
+      file: classpath:/sql/create-history-entity.xml
