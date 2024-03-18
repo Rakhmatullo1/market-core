@@ -27,4 +27,6 @@ public class History {
     @Enumerated(EnumType.STRING)
     private Action4Product action;
     private String byUser;
+    @ManyToOne
+    private User user;
 }

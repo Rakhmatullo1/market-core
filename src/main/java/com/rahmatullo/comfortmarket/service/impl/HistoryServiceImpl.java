@@ -12,6 +12,7 @@ import com.rahmatullo.comfortmarket.service.enums.Action4Product;
 import com.rahmatullo.comfortmarket.service.mapper.HistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -38,6 +39,7 @@ public class HistoryServiceImpl implements HistoryService {
         history.setByUser(user.getUsername());
         history.setCreatedAt(new Date(System.currentTimeMillis()));
         history.setProduct(toProduct(((Long) details.get("id"))));
+        history.setUser(authService.getOwner());
         history.setId(null);
 
         historyRepository.save(history);
@@ -45,15 +47,15 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public List<HistoryDto> getHistory(Long productId) {
-        return getHistory((long) productId)
+    public List<HistoryDto> getHistory(Long productId, Pageable pageable) {
+        return getHistory((long) productId, pageable)
                 .stream().map(historyMapper::toHistoryDto).toList();
     }
 
     @Override
-    public List<History> getHistory(long productId) {
+    public List<History> getHistory(long productId , Pageable pageable) {
         return historyRepository
-                .getAllByProduct(toProduct(productId));
+                .getAllByProductAndUser(toProduct(productId), authService.getOwner(), pageable).getContent();
     }
 
     private Product toProduct(Long id) {

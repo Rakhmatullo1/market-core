@@ -7,3 +7,5 @@ databaseChangeLog:
       file: classpath:/sql/change-product.xml
   - include:
       file: classpath:/sql/create-history-entity.xml
+  - include:
+      file: classpath:/sql/change-history-table.xml

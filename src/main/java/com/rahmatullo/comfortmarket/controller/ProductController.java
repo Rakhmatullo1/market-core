@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,8 +59,8 @@ public class ProductController {
     }
 
     @GetMapping("/history/{id}")
-    public ResponseEntity<List<HistoryDto>> getHistory(@PathVariable Long id) {
-        return ResponseEntity.ok(historyService.getHistory(id));
+    public ResponseEntity<List<HistoryDto>> getHistory(@PathVariable Long id, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(historyService.getHistory(id, PageRequest.of(page, size)));
     }
 
     @PostMapping("/upload-file/{id}")
@@ -74,7 +75,6 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto, @RequestParam Long premiseId){
-
         Map<Object, Object> details = new HashMap<>();
 
         ProductDto oldProductDto = toProductDto(id);
@@ -82,7 +82,7 @@ public class ProductController {
         ProductDto productDto = productService.updateProduct(id, productRequestDto, premiseId);
 
         details.put("action",Action4Product.UPDATED);
-        details.put("description", String.format("%s product updated to premise %s \n [%s] \n old version: [%s] ", id, premiseId, productDto.toString(),oldProductDto.toString()));
+        details.put("description", String.format("%s, %s product updated to premise %s \n [%s] \n old version: [%s] ", oldProductDto.getName(), oldProductDto.getBarcode(),  premiseId,productDto.toString(), oldProductDto));
         details.put("id", id);
 
         return ResponseEntity.ok(historyService.createHistory(productDto,details));
@@ -90,7 +90,6 @@ public class ProductController {
 
     @PutMapping("/transfer/part/{id}")
     public ResponseEntity<ProductDto> transferProductPartly(@PathVariable Long id , @RequestBody ProductTransferDto productTransferDto) {
-
         Map<Object, Object> details = new HashMap<>();
         ProductDto productDto = toProductDto(id);
         details.put("action",Action4Product.TRANSFERRED);
@@ -114,7 +113,7 @@ public class ProductController {
 
     @DeleteMapping("/all/{id}")
     public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id) {
-        historyService.getHistory(((long) id)).forEach(value->value.setProduct(null));
+        historyService.getHistory(((long) id), Pageable.unpaged()).forEach(value->value.setProduct(null));
         ProductDto productDto = toProductDto(id);
 
         Map<Object, Object> details = new HashMap<>();
@@ -126,7 +125,7 @@ public class ProductController {
         return ResponseEntity.ok(historyService.createHistory(productService.deleteProduct(id), details));
     }
 
-    private ProductDto toProductDto(Long id) {
+    public ProductDto toProductDto(Long id) {
         return productMapper.toProductDto(productService.toProduct(id, authService.getOwner()));
     }
 }
