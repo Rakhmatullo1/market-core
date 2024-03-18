@@ -21,9 +21,12 @@ public class History {
     private Long id;
     @ManyToOne
     private Product product;
+    @Column(length = 10240)
     private String description;
     private Date createdAt;
     @Enumerated(EnumType.STRING)
     private Action4Product action;
     private String byUser;
+    @ManyToOne
+    private User user;
 }

@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Mapper(componentModel = "spring")
 public interface HistoryMapper {
@@ -18,6 +19,9 @@ public interface HistoryMapper {
 
     @Named("getProductName")
     default String getProductName(Product product) {
+        if(Objects.isNull(product)){
+            return "_._";
+        }
         return product.getName();
     }
 
