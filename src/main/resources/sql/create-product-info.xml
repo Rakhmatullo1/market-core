@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+
+    <changeSet id="1" author="Raxmatullo">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_info"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_info">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="producer" type="VARCHAR(255)"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="category_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="Raxmatullo">
+        <preConditions>
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="product_category_fk"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="product_info" baseColumnNames="category_id" constraintName="product_category_fk" referencedTableName="category"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

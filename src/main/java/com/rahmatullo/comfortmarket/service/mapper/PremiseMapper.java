@@ -9,6 +9,7 @@ import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.impl.UserServiceImpl;
+import jakarta.servlet.Servlet;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -54,7 +55,7 @@ public abstract class PremiseMapper {
     @Named("getWorkers")
     List<UserDto> getWorkers(Set<User> users) {
         return users.stream()
-                .filter(user -> !Objects.equals(user.getRole(),UserRole.ADMIN ))
+                .filter(user -> !Objects.equals(user.getRole(),UserRole.OWNER ))
                 .map(userMapper::toUserDto)
                 .toList();
     }
