@@ -16,6 +16,7 @@ import java.util.List;
 @Mapper(injectionStrategy = InjectionStrategy.CONSTRUCTOR, componentModel = "spring")
 public abstract class UserMapper {
 
+    @Mapping(target = "income", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "workers", ignore = true)
     @Mapping(target = "premise", ignore = true)

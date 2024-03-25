@@ -38,7 +38,6 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final PremiseRepository premiseRepository;
 
-    private final ProposalRepository proposalRepository;
     private final ProductMapper productMapper;
     private final PremiseMapper premiseMapper;
     private final CategoryService categoryService;
@@ -90,9 +89,7 @@ public class ProductServiceImpl implements ProductService {
 
         try {
             Map<Integer, List<ProductRequestDto>> products = ExcelUtils.excelToProducts(file.getInputStream());
-            products.keySet().forEach(productKey->{
-                products.get(productKey).forEach(product-> addProductsToPremise(Long.valueOf(productKey), product));
-            });
+            products.keySet().forEach(productKey-> products.get(productKey).forEach(product-> addProductsToPremise(Long.valueOf(productKey), product)));
             return new MessageDto("Successfully fetched all data");
         } catch (IOException e) {
             throw new FileUploadException(e.getMessage());
@@ -170,7 +167,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
 
         if(product.getCount().isEmpty()) {
-            deleteProductFromHistory(product);
             productRepository.delete(product);
         }
 
@@ -185,7 +181,6 @@ public class ProductServiceImpl implements ProductService {
         removeProductFromCategory(product);
         product.setOwner(null);
 
-        deleteProductFromHistory(product);
         productRepository.delete(productRepository.save(product));
         return new MessageDto("Successfully deleted");
     }
@@ -321,10 +316,4 @@ public class ProductServiceImpl implements ProductService {
             product.getPremise().add(premise);
         }
     }
-
-    private void deleteProductFromHistory(Product product) {
-        List<ProductProposal>  proposals = proposalRepository.findByProduct(product);
-        proposals.forEach(p->p.setProduct(null));
-        proposalRepository.saveAll(proposals);
-    };
 }

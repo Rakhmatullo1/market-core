@@ -1,6 +1,6 @@
 package com.rahmatullo.comfortmarket.service.enums;
 
-public enum ProposalStatus {
+public enum InvoiceStatus {
     PENDING,
     ACCEPTED,
     REJECTED

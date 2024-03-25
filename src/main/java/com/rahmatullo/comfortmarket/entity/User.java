@@ -32,6 +32,7 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
     private boolean isEnabled =false;
+    private Double income;
     @ManyToMany
     @JoinTable(name = "user_premise", joinColumns = @JoinColumn(name = "worker_id"), inverseJoinColumns = @JoinColumn(name = "premise_id"))
     private List<Premise> premise = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.entity;
 
+import com.rahmatullo.comfortmarket.service.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,5 +25,11 @@ public class Invoice {
     private String description;
     @ManyToOne
     private Premise premise;
-    private Double overallPrice;
+    private Double overallInitialPrice;
+    private Double overallFinalPrice;
+    @ManyToOne
+    private User toUser;
+    private String createdBy;
+    private boolean isApproved;
+    private InvoiceStatus status;
 }
