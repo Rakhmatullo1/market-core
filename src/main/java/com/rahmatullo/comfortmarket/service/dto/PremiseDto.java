@@ -8,7 +8,6 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PremiseDto {
-    private Long productId;
     private Long id;
     private String type;
     private String address;

@@ -19,8 +19,6 @@ public interface ProductService {
 
     MessageDto convertXLSFile2Products(MultipartFile file);
 
-    PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto);
-
     ProductDto updateProduct(Long id, ProductRequestDto productRequestDto, Long premiseId);
 
     ProductDto  transfersProductPartly(Long id, ProductTransferDto productTransferDto);

@@ -21,7 +21,7 @@ public abstract class  ProductInfoMapper {
     @Mapping(target = "id", ignore = true)
     public abstract ProductInfo toProductInfo(ProductInfoRequestDto productInfoRequestDto);
 
-    @Mapping(target = "category", source = "category", expression = "java(productInfo.getCategory().getName())")
+    @Mapping(target = "category", expression = "java(productInfo.getCategory().getName())")
     public abstract ProductInfoDto toProductInfoDto(ProductInfo productInfo);
 
     @Named("getCategory")

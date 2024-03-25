@@ -11,3 +11,5 @@ databaseChangeLog:
       file: classpath:/sql/change-history-table.xml
   - include:
       file: classpath:/sql/create-product-info.xml
+  - include:
+      file: classpath:/sql/deleteing-history-entity.xml

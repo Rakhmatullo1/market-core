@@ -4,10 +4,8 @@ import com.rahmatullo.comfortmarket.entity.*;
 import com.rahmatullo.comfortmarket.repository.*;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.CategoryService;
-import com.rahmatullo.comfortmarket.service.HistoryService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.*;
-import com.rahmatullo.comfortmarket.service.enums.Action4Product;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
@@ -23,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.rahmatullo.comfortmarket.service.mapper.ProductMapper.getFormattedString;
 
@@ -41,7 +42,6 @@ public class ProductServiceImpl implements ProductService {
     private final PremiseMapper premiseMapper;
     private final CategoryService categoryService;
     private final AuthService authService;
-    private final HistoryService historyService;
 
     @Override
     public List<ProductDto> getProductsByCategoryId(Long categoryId, PageRequest pageRequest) {
@@ -98,8 +98,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    @Override
-    public PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto) {
+    private PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto) {
         log.info("Requested to add new products to premise {}", id);
         Premise premise = toPremise(id);
 
@@ -115,16 +114,7 @@ public class ProductServiceImpl implements ProductService {
 
         addProduct2Category( product);
 
-        PremiseDto premiseDto = premiseMapper.toPremiseDto(premiseRepository.save(premise));
-        premiseDto.setProductId(product.getId());
-
-        Map<Object, Object> details = new HashMap<>();
-
-        details.put("action", Action4Product.CREATED);
-        details.put("description", String.format("%s, %s product created on premise %s", product.getId(), product.getBarcode(), id));
-        details.put("id", product.getId());
-
-        return historyService.createHistory(premiseMapper.toPremiseDto(premiseRepository.save(premise)), details);
+        return premiseMapper.toPremiseDto(premiseRepository.save(premise));
     }
 
     @Override

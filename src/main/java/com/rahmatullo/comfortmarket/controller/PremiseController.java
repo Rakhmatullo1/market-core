@@ -1,12 +1,9 @@
 package com.rahmatullo.comfortmarket.controller;
 
-import com.rahmatullo.comfortmarket.service.HistoryService;
 import com.rahmatullo.comfortmarket.service.PremiseService;
-import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -21,17 +18,10 @@ import java.util.List;
 public class PremiseController {
 
     private final PremiseService premiseService;
-    private final ProductService productService;
-    private final HistoryService historyService;
 
     @PostMapping()
     public ResponseEntity<PremiseDto> createPremise(@Valid @RequestBody PremiseRequestDto premiseRequestDto) {
         return ResponseEntity.ok(premiseService.createPremise(premiseRequestDto));
-    }
-
-    @PostMapping("/{id}/add-product")
-    public ResponseEntity<PremiseDto> addProducts(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto){
-        return ResponseEntity.ok(productService.addProductsToPremise(id, productRequestDto));
     }
 
     @PostMapping("/{id}/add_user/{userId}")

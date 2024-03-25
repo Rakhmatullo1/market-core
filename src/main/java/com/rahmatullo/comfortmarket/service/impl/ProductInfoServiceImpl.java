@@ -40,7 +40,7 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     public List<ProductInfoDto> getAll(Pageable pageable) {
         log.info("Requested to get all product info");
         return productInfoRepository
-                .getAll(pageable)
+                .findAll(pageable)
                 .stream()
                 .map(productInfoMapper::toProductInfoDto)
                 .toList();
