@@ -2,6 +2,7 @@ package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.InvoiceService;
 import com.rahmatullo.comfortmarket.service.dto.InvoiceDto;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.request.InvoiceRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,5 +26,10 @@ public class InvoiceController {
     @GetMapping
     public ResponseEntity<List<InvoiceDto>> getAll(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size){
         return ResponseEntity.ok(invoiceService.getAll(PageRequest.of(page, size)));
+    }
+
+    @PostMapping("/make-decision/{id}")
+    public ResponseEntity<MessageDto> makeDecision(@PathVariable Long id, @RequestParam boolean isApproved ){
+        return ResponseEntity.ok(invoiceService.makeDecision(isApproved, id));
     }
 }

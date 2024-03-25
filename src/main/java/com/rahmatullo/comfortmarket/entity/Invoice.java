@@ -30,6 +30,7 @@ public class Invoice {
     @ManyToOne
     private User toUser;
     private String createdBy;
+    //remove property
     private boolean isApproved;
     private InvoiceStatus status;
 }

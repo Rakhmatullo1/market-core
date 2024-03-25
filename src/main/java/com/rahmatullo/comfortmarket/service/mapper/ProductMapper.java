@@ -1,9 +1,6 @@
 package com.rahmatullo.comfortmarket.service.mapper;
 
-import com.rahmatullo.comfortmarket.entity.Category;
-import com.rahmatullo.comfortmarket.entity.Premise;
-import com.rahmatullo.comfortmarket.entity.Product;
-import com.rahmatullo.comfortmarket.entity.User;
+import com.rahmatullo.comfortmarket.entity.*;
 import com.rahmatullo.comfortmarket.repository.CategoryRepository;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
@@ -37,19 +34,7 @@ public abstract  class ProductMapper {
     @Mapping(target = "extra", source = "count", qualifiedByName = "getExtra")
     @Mapping(target = "category", expression = "java(product.getCategory().getName())")
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "date")
-
     public abstract ProductDto toProductDto(Product product);
-
-    @Mapping(target = "url", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(getCreatedTime())")
-    @Mapping(target = "premise", ignore = true)
-    @Mapping(target = "owner", ignore = true)
-    @Mapping(target = "category", source = "productRequestDto.categoryId", qualifiedByName = "getCategory")
-    @Mapping(target = "addedBy", expression = "java(addedBy(user))")
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "name", source = "productRequestDto.name")
-    @Mapping(target = "count", expression = "java(getCount(productRequestDto.getCount(), premise))")
-    public abstract Product toProduct(ProductRequestDto productRequestDto, Premise premise, User user);
 
     @Mapping(target = "id", source = "product.id")
     @Mapping(target = "name", source = "productRequestDto.name")
@@ -62,6 +47,17 @@ public abstract  class ProductMapper {
     @Mapping(target = "premise", source = "product.premise")
     @Mapping(target = "category", source = "product.category")
     public abstract Product toProduct(ProductRequestDto productRequestDto, Product product, Long premiseId);
+
+    @Mapping(target = "url", ignore = true)
+    @Mapping(target = "price", expression = "java(productDetails.getFinalPrice())")
+    @Mapping(target = "premise", source = "premise")
+    @Mapping(target = "owner", expression = "java(authService.getOwner())")
+    @Mapping(target = "name", expression = "java(productDetails.getProductInfo().getName())")
+    @Mapping(target = "createdAt", expression = "java(getCreatedTime())")
+    @Mapping(target = "category", expression = "java(productDetails.getProductInfo().getCategory())")
+    @Mapping(target = "barcode", expression = "java(productDetails.getProductInfo().getBarcode())")
+    @Mapping(target = "addedBy", expression = "java(addedBy(authService.getUser()))")
+    public abstract Product toProduct(ProductDetails productDetails, Premise premise);
 
     @Named("addedBy")
     String addedBy(User user) {

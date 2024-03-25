@@ -65,11 +65,6 @@ public class ProductController {
         return ResponseEntity.ok(fileService.uploadPhoto2Product(id, file));
     }
 
-    @PostMapping("/upload_file/to/products")
-    public ResponseEntity<MessageDto> convertXSLFile(@RequestParam MultipartFile file) {
-        return ResponseEntity.ok(productService.convertXLSFile2Products(file));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto, @RequestParam Long premiseId){
         return ResponseEntity.ok(productService.updateProduct(id, productRequestDto, premiseId));

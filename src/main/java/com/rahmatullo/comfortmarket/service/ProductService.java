@@ -18,8 +18,6 @@ public interface ProductService {
 
     ProductDto getById(Long id);
 
-    MessageDto convertXLSFile2Products(MultipartFile file);
-
     ProductDto updateProduct(Long id, ProductRequestDto productRequestDto, Long premiseId);
 
     ProductDto  transfersProductPartly(Long id, ProductTransferDto productTransferDto);
