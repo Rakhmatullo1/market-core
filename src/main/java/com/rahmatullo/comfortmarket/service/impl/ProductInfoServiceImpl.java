@@ -5,6 +5,7 @@ import com.rahmatullo.comfortmarket.repository.ProductInfoRepository;
 import com.rahmatullo.comfortmarket.service.ProductInfoService;
 import com.rahmatullo.comfortmarket.service.dto.ProductInfoDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductInfoRequestDto;
+import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.ProductInfoMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,12 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     @Override
     public ProductInfoDto create(ProductInfoRequestDto productInfoRequestDto) {
         log.info("Requested to create product info");
+
+        if(productInfoRepository.existsByBarcode(productInfoRequestDto.getBarcode())){
+            log.warn("Barcode exists");
+            throw new ExistsException("Product exists in database");
+        }
+
         ProductInfo productInfo = productInfoMapper.toProductInfo(productInfoRequestDto);
         return productInfoMapper.toProductInfoDto(productInfoRepository.save(productInfo));
     }

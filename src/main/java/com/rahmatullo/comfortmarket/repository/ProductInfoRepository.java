@@ -11,4 +11,6 @@ import java.util.List;
 public interface ProductInfoRepository  extends JpaRepository<ProductInfo, Long> {
 
     List<ProductInfo> getAll(Pageable pageable);
+
+    boolean existsByBarcode(String barcode);
 }
