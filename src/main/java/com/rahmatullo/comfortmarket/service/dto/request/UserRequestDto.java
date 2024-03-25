@@ -1,4 +1,4 @@
-package com.rahmatullo.comfortmarket.service.dto;
+package com.rahmatullo.comfortmarket.service.dto.request;
 
 import lombok.Data;
 

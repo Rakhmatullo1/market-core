@@ -2,10 +2,10 @@ package com.rahmatullo.comfortmarket.service.mapper;
 
 import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.User;
-import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
-import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.UserRequestDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

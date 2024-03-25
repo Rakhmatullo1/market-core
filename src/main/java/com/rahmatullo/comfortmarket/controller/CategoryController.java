@@ -2,7 +2,7 @@ package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.dto.CategoryDto;
-import com.rahmatullo.comfortmarket.service.dto.CategoryRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.CategoryRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

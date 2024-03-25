@@ -1,32 +1,28 @@
 package com.rahmatullo.comfortmarket.entity;
 
-import com.rahmatullo.comfortmarket.service.enums.Action4Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.sql.Date;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "history")
-public class History {
+public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    private Product product;
-    @Column(length = 10240)
+    private Date date;
+    @OneToMany
+    private Set<ProductDetails> productDetailsSet;
     private String description;
-    private Date createdAt;
-    @Enumerated(EnumType.STRING)
-    private Action4Product action;
-    private String byUser;
     @ManyToOne
-    private User user;
+    private Premise premise;
+    private Double overallPrice;
 }

@@ -9,7 +9,7 @@ import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.dto.ProductCountDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.InjectionStrategy;

@@ -3,6 +3,7 @@ package com.rahmatullo.comfortmarket.service;
 import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.*;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
 

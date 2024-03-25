@@ -7,6 +7,7 @@ import com.rahmatullo.comfortmarket.repository.UserRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.*;
+import com.rahmatullo.comfortmarket.service.dto.request.UserRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;

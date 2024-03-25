@@ -1,6 +1,6 @@
 package com.rahmatullo.comfortmarket.service.utils;
 
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.FileUploadException;

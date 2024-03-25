@@ -1,9 +1,9 @@
 package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.AuthService;
-import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ResponseBodyDto;
-import com.rahmatullo.comfortmarket.service.dto.SignInRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.SignInRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

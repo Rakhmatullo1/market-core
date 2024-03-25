@@ -11,7 +11,7 @@ import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
-import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
@@ -22,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 

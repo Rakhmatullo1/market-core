@@ -4,7 +4,7 @@ import com.rahmatullo.comfortmarket.entity.Category;
 import com.rahmatullo.comfortmarket.repository.CategoryRepository;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.dto.CategoryDto;
-import com.rahmatullo.comfortmarket.service.dto.CategoryRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.CategoryRequestDto;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.CategoryMapper;

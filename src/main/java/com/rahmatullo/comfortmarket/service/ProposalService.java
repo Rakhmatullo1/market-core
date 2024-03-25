@@ -1,7 +1,7 @@
 package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.service.dto.ProposalDto;
-import com.rahmatullo.comfortmarket.service.dto.ProposalRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProposalRequestDto;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;

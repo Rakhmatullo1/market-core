@@ -1,23 +1,15 @@
 package com.rahmatullo.comfortmarket.controller;
 
-import com.rahmatullo.comfortmarket.service.AuthService;
-import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.ProposalService;
-import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.ProposalDto;
-import com.rahmatullo.comfortmarket.service.dto.ProposalRequestDto;
-import com.rahmatullo.comfortmarket.service.enums.Action4Product;
-import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
+import com.rahmatullo.comfortmarket.service.dto.request.ProposalRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/proposal")

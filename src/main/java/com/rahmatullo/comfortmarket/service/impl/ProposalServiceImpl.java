@@ -10,7 +10,7 @@ import com.rahmatullo.comfortmarket.repository.ProposalRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.ProposalService;
 import com.rahmatullo.comfortmarket.service.dto.ProposalDto;
-import com.rahmatullo.comfortmarket.service.dto.ProposalRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProposalRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.Action;
 import com.rahmatullo.comfortmarket.service.enums.ProposalStatus;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;

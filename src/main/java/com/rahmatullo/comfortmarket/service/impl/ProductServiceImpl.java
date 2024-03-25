@@ -6,6 +6,7 @@ import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.*;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
@@ -36,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final PremiseRepository premiseRepository;
-    private final HistoryRepository historyRepository;
+
     private final ProposalRepository proposalRepository;
     private final ProductMapper productMapper;
     private final PremiseMapper premiseMapper;
@@ -169,7 +170,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
 
         if(product.getCount().isEmpty()) {
-            deleteProductFromProposals(product);
             deleteProductFromHistory(product);
             productRepository.delete(product);
         }
@@ -185,7 +185,6 @@ public class ProductServiceImpl implements ProductService {
         removeProductFromCategory(product);
         product.setOwner(null);
 
-        deleteProductFromProposals(product);
         deleteProductFromHistory(product);
         productRepository.delete(productRepository.save(product));
         return new MessageDto("Successfully deleted");
@@ -322,12 +321,6 @@ public class ProductServiceImpl implements ProductService {
             product.getPremise().add(premise);
         }
     }
-
-    private void deleteProductFromProposals(Product product) {
-        List<History> histories = historyRepository.getByProduct(product);
-        histories.forEach(h->h.setProduct(null));
-        historyRepository.saveAll(histories);
-    };
 
     private void deleteProductFromHistory(Product product) {
         List<ProductProposal>  proposals = proposalRepository.findByProduct(product);

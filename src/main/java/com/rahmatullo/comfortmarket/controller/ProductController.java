@@ -4,7 +4,7 @@ import com.rahmatullo.comfortmarket.service.FileService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductTransferDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class ProductController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ProductDto>> getProductsPremise(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
+    public ResponseEntity<List<ProductDto>> getProductsOwner(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(productService.getProductByOwner(PageRequest.of(page, size)));
     }
 
