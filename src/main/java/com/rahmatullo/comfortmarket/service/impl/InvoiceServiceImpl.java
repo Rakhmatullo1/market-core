@@ -2,9 +2,11 @@ package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.entity.Invoice;
 import com.rahmatullo.comfortmarket.entity.Premise;
+import com.rahmatullo.comfortmarket.entity.Product;
 import com.rahmatullo.comfortmarket.repository.InvoiceRepository;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductDetailsRepository;
+import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.InvoiceService;
 import com.rahmatullo.comfortmarket.service.dto.InvoiceDto;
@@ -33,10 +35,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final ProductDetailsMapper productDetailsMapper;
     private final ProductDetailsRepository productDetailsRepository;
+    private final ProductRepository productRepository;
     private final InvoiceMapper invoiceMapper;
     private final AuthService authService;
     private final ProductMapper productMapper;
-
     private final PremiseRepository premiseRepository;
 
     @Override
@@ -78,7 +80,11 @@ public class InvoiceServiceImpl implements InvoiceService {
             premise.getProducts().addAll(
                     invoice.getProductDetailsSet()
                             .stream()
-                            .map(p->productMapper.toProduct(p, premise))
+                            .map(p-> {
+                                Product product = productMapper.toProduct(p);
+                                product.getCount().add(String.format("%s:%s", premise.getId(), p.getCount()));
+                                return productRepository.save(product);
+                            })
                             .collect(Collectors.toSet()));
 
             premiseRepository.save(premise);

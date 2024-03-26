@@ -48,29 +48,17 @@ public abstract  class ProductMapper {
     @Mapping(target = "category", source = "product.category")
     public abstract Product toProduct(ProductRequestDto productRequestDto, Product product, Long premiseId);
 
+    @Mapping(target = "premise", ignore = true)
     @Mapping(target = "url", ignore = true)
     @Mapping(target = "price", expression = "java(productDetails.getFinalPrice())")
-    @Mapping(target = "premise", source = "premise")
-    @Mapping(target = "owner", expression = "java(authService.getOwner())")
+    @Mapping(target = "owner", expression = "java(getOwner())")
     @Mapping(target = "name", expression = "java(productDetails.getProductInfo().getName())")
     @Mapping(target = "createdAt", expression = "java(getCreatedTime())")
     @Mapping(target = "category", expression = "java(productDetails.getProductInfo().getCategory())")
     @Mapping(target = "barcode", expression = "java(productDetails.getProductInfo().getBarcode())")
-    @Mapping(target = "addedBy", expression = "java(addedBy(authService.getUser()))")
-    public abstract Product toProduct(ProductDetails productDetails, Premise premise);
-
-    @Named("addedBy")
-    String addedBy(User user) {
-        return user.getUsername();
-    }
-
-    @Named("getCategory")
-    Category getCategory(Long id) {
-        return categoryRepository.findById(id).orElseThrow(()->{
-            log.warn("Category is not found ");
-            throw new NotFoundException("Category is not found "+id);
-        });
-    }
+    @Mapping(target = "addedBy", expression = "java(getCreator())")
+    @Mapping(target = "count", ignore = true)
+    public abstract Product toProduct(ProductDetails productDetails);
 
     Date getCreatedTime() {
         return new Date(System.currentTimeMillis());
@@ -90,11 +78,6 @@ public abstract  class ProductMapper {
 
             return new ProductCountDto(premise.getName(), Integer.parseInt(parts[1]));
         }).toList();
-    }
-
-    @Named("getCount")
-    List<String> getCount( int count,Premise premise) {
-        return List.of(getFormattedString(premise, count));
     }
 
     @Named("changeCount")
@@ -121,5 +104,13 @@ public abstract  class ProductMapper {
 
     static public String getFormattedString(Premise premise, Object count) {
         return String.format("%s:%s", premise.getId(), count);
+    }
+
+    User getOwner() {
+        return authService.getOwner();
+    }
+
+    String getCreator() {
+        return authService.getUser().getUsername();
     }
 }
