@@ -4,7 +4,7 @@ import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
-import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.UserRequestDto;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;

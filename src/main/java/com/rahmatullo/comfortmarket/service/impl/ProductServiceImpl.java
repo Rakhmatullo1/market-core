@@ -1,11 +1,19 @@
 package com.rahmatullo.comfortmarket.service.impl;
 
-import com.rahmatullo.comfortmarket.entity.*;
-import com.rahmatullo.comfortmarket.repository.*;
+import com.rahmatullo.comfortmarket.entity.Category;
+import com.rahmatullo.comfortmarket.entity.Premise;
+import com.rahmatullo.comfortmarket.entity.Product;
+import com.rahmatullo.comfortmarket.entity.User;
+import com.rahmatullo.comfortmarket.repository.CategoryRepository;
+import com.rahmatullo.comfortmarket.repository.PremiseRepository;
+import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.CategoryService;
 import com.rahmatullo.comfortmarket.service.ProductService;
-import com.rahmatullo.comfortmarket.service.dto.*;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
+import com.rahmatullo.comfortmarket.service.dto.ProductDto;
+import com.rahmatullo.comfortmarket.service.dto.ProductTransferDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
@@ -20,9 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,8 +42,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final PremiseRepository premiseRepository;
-    private final HistoryRepository historyRepository;
-    private final ProposalRepository proposalRepository;
+
     private final ProductMapper productMapper;
     private final PremiseMapper premiseMapper;
     private final CategoryService categoryService;
@@ -78,43 +83,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByIdAndOwner(id, owner).orElseThrow(()->new NotFoundException("Product is not found"));
 
         return productMapper.toProductDto(product);
-    }
-
-
-    @Override
-    public MessageDto convertXLSFile2Products(MultipartFile file) {
-        log.info("Requested to convert xsl file to database");
-
-        checkFile(file);
-
-        try {
-            Map<Integer, List<ProductRequestDto>> products = ExcelUtils.excelToProducts(file.getInputStream());
-            products.keySet().forEach(productKey->{
-                products.get(productKey).forEach(product-> addProductsToPremise(Long.valueOf(productKey), product));
-            });
-            return new MessageDto("Successfully fetched all data");
-        } catch (IOException e) {
-            throw new FileUploadException(e.getMessage());
-        }
-    }
-
-    private PremiseDto addProductsToPremise(Long id, ProductRequestDto productRequestDto) {
-        log.info("Requested to add new products to premise {}", id);
-        Premise premise = toPremise(id);
-
-        Product product = productMapper.toProduct(productRequestDto,premise, authService.getUser());
-        product.getPremise().add(premise);
-
-        checkProductByBarcode(productRequestDto);
-
-        User owner = checkAndGetOwner(premise);
-
-        product.setOwner(owner);
-        product = productRepository.save(product);
-
-        addProduct2Category( product);
-
-        return premiseMapper.toPremiseDto(premiseRepository.save(premise));
     }
 
     @Override
@@ -169,8 +137,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
 
         if(product.getCount().isEmpty()) {
-            deleteProductFromProposals(product);
-            deleteProductFromHistory(product);
             productRepository.delete(product);
         }
 
@@ -185,8 +151,6 @@ public class ProductServiceImpl implements ProductService {
         removeProductFromCategory(product);
         product.setOwner(null);
 
-        deleteProductFromProposals(product);
-        deleteProductFromHistory(product);
         productRepository.delete(productRepository.save(product));
         return new MessageDto("Successfully deleted");
     }
@@ -322,16 +286,4 @@ public class ProductServiceImpl implements ProductService {
             product.getPremise().add(premise);
         }
     }
-
-    private void deleteProductFromProposals(Product product) {
-        List<History> histories = historyRepository.getByProduct(product);
-        histories.forEach(h->h.setProduct(null));
-        historyRepository.saveAll(histories);
-    };
-
-    private void deleteProductFromHistory(Product product) {
-        List<ProductProposal>  proposals = proposalRepository.findByProduct(product);
-        proposals.forEach(p->p.setProduct(null));
-        proposalRepository.saveAll(proposals);
-    };
 }

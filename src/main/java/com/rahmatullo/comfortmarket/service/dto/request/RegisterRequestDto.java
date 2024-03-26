@@ -1,4 +1,4 @@
-package com.rahmatullo.comfortmarket.service.dto;
+package com.rahmatullo.comfortmarket.service.dto.request;
 
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import jakarta.validation.constraints.NotNull;

@@ -1,10 +1,13 @@
 package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.FileService;
+import com.rahmatullo.comfortmarket.service.ProductInfoService;
 import com.rahmatullo.comfortmarket.service.ProductService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.ProductInfoDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductInfoRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductTransferDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductInfoService productInfoService;
     private final FileService fileService;
 
     @GetMapping("/by-category/{id}")
@@ -36,7 +40,7 @@ public class ProductController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ProductDto>> getProductsPremise(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
+    public ResponseEntity<List<ProductDto>> getProductsOwner(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(productService.getProductByOwner(PageRequest.of(page, size)));
     }
 
@@ -51,14 +55,14 @@ public class ProductController {
                 .ok().header("Content-Type", "image/jpeg", "image/png").body(fileService.loadPhoto(name));
     }
 
+    @PostMapping()
+    public ResponseEntity<ProductInfoDto> create(@RequestBody ProductInfoRequestDto productInfoRequestDto) {
+        return ResponseEntity.ok(productInfoService.create(productInfoRequestDto));
+    }
+
     @PostMapping("/upload-file/{id}")
     public ResponseEntity<ProductDto> uploadFile(@RequestParam MultipartFile file, @PathVariable Long id) {
         return ResponseEntity.ok(fileService.uploadPhoto2Product(id, file));
-    }
-
-    @PostMapping("/upload_file/to/products")
-    public ResponseEntity<MessageDto> convertXSLFile(@RequestParam MultipartFile file) {
-        return ResponseEntity.ok(productService.convertXLSFile2Products(file));
     }
 
     @PutMapping("/{id}")

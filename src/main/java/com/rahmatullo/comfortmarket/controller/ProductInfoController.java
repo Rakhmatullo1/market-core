@@ -2,7 +2,7 @@ package com.rahmatullo.comfortmarket.controller;
 
 import com.rahmatullo.comfortmarket.service.ProductInfoService;
 import com.rahmatullo.comfortmarket.service.dto.ProductInfoDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductInfoRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductInfoRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;

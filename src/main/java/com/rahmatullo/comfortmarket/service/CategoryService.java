@@ -2,7 +2,7 @@ package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.Category;
 import com.rahmatullo.comfortmarket.service.dto.CategoryDto;
-import com.rahmatullo.comfortmarket.service.dto.CategoryRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.CategoryRequestDto;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import com.rahmatullo.comfortmarket.entity.ProductInfo;
 import com.rahmatullo.comfortmarket.repository.ProductInfoRepository;
 import com.rahmatullo.comfortmarket.service.ProductInfoService;
 import com.rahmatullo.comfortmarket.service.dto.ProductInfoDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductInfoRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.ProductInfoRequestDto;
 import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.ProductInfoMapper;

@@ -2,10 +2,10 @@ package com.rahmatullo.comfortmarket.service.mapper;
 
 import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.User;
-import com.rahmatullo.comfortmarket.service.dto.RegisterRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.RegisterRequestDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDto;
 import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
-import com.rahmatullo.comfortmarket.service.dto.UserRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.UserRequestDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,6 +16,7 @@ import java.util.List;
 @Mapper(injectionStrategy = InjectionStrategy.CONSTRUCTOR, componentModel = "spring")
 public abstract class UserMapper {
 
+    @Mapping(target = "income", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "workers", ignore = true)
     @Mapping(target = "premise", ignore = true)

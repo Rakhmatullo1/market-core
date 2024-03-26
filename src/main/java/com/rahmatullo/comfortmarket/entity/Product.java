@@ -3,10 +3,7 @@ package com.rahmatullo.comfortmarket.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -22,7 +19,7 @@ public class Product {
     private String barcode;
     private Date createdAt;
     @ElementCollection
-    private List<String> count;
+    private List<String> count=new ArrayList<>();
     private Double price;
     private String url;
     @ManyToOne

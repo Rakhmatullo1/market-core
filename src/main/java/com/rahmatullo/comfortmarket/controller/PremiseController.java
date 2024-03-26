@@ -3,7 +3,7 @@ package com.rahmatullo.comfortmarket.controller;
 import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
-import com.rahmatullo.comfortmarket.service.dto.PremiseRequestDto;
+import com.rahmatullo.comfortmarket.service.dto.request.PremiseRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
