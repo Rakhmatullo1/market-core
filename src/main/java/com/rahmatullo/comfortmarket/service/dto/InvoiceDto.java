@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.service.dto;
 
+import com.rahmatullo.comfortmarket.service.enums.Action;
 import com.rahmatullo.comfortmarket.service.enums.InvoiceStatus;
 import lombok.Data;
 
@@ -17,5 +18,6 @@ public class InvoiceDto {
     private String toUser;
     private String createdBy;
     private InvoiceStatus status;
-    private boolean isApproved;
+    private String previousPremiseName;
+    private Action action;
 }

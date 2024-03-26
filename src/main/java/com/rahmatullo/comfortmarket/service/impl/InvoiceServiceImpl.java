@@ -3,8 +3,8 @@ package com.rahmatullo.comfortmarket.service.impl;
 import com.rahmatullo.comfortmarket.entity.Invoice;
 import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.Product;
+import com.rahmatullo.comfortmarket.entity.ProductDetails;
 import com.rahmatullo.comfortmarket.repository.InvoiceRepository;
-import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductDetailsRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
@@ -25,7 +25,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.rahmatullo.comfortmarket.service.mapper.ProductMapper.getFormattedString;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +42,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceMapper invoiceMapper;
     private final AuthService authService;
     private final ProductMapper productMapper;
-    private final PremiseRepository premiseRepository;
 
     @Override
     public InvoiceDto create(InvoiceRequestDto requestDto) {
@@ -75,19 +77,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setStatus(isApproved ? InvoiceStatus.ACCEPTED : InvoiceStatus.REJECTED);
 
         if(isApproved) {
-            Premise premise = invoice.getPremise();
-
-            premise.getProducts().addAll(
-                    invoice.getProductDetailsSet()
-                            .stream()
-                            .map(p-> {
-                                Product product = productMapper.toProduct(p);
-                                product.getCount().add(String.format("%s:%s", premise.getId(), p.getCount()));
-                                return productRepository.save(product);
-                            })
-                            .collect(Collectors.toSet()));
-
-            premiseRepository.save(premise);
+            addingProductsOnPremise(invoice);
         }
 
         invoiceRepository.save(invoice);
@@ -96,5 +86,59 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private Invoice toInvoice(Long id) {
         return invoiceRepository.findByIdAndToUser(id, authService.getOwner()).orElseThrow(()->new NotFoundException("Invoice is not found"));
+    }
+
+    private Optional<String> findCount(Long premiseId, Product product) {
+        return  product.getCount().stream()
+                .filter(c->Objects.equals(Long.parseLong(c.split(":")[0]), premiseId))
+                .findFirst();
+    }
+
+    private void addingProductsOnPremise(Invoice invoice) {
+        log.info("Requested to add product on premise with invoice");
+        Premise premise = invoice.getPremise();
+
+        invoice.getProductDetailsSet().forEach(p->{
+            Optional<Product> product =productRepository.findByPremiseAndBarcode(premise, p.getProductInfo().getBarcode());
+            if(product.isEmpty()) {
+                createProductsOnPremise(p, premise);
+            }
+
+            if(product.isPresent()) {
+                Product theProduct = product.get();
+                updateProductsOnPremise(theProduct, p, premise);
+            }
+        });
+    }
+
+    private void createProductsOnPremise(ProductDetails productDetails, Premise premise) {
+        log.info("Requested to create product on premise {}", premise.getId());
+        Product theProduct =productMapper.toProduct(productDetails);
+
+        theProduct.getCount().add(getFormattedString(premise, productDetails.getCount()));
+        theProduct.getPremise().add(premise);
+
+        productRepository.save(theProduct);
+        log.info("Successfully created");
+    }
+
+    private void updateProductsOnPremise(Product theProduct, ProductDetails productDetails, Premise premise){
+        log.info("Requested to update product {} on premise {}", theProduct.getId(), premise.getId());
+
+        Optional<String> countOnPremise = findCount(premise.getId(), theProduct);
+
+        if(countOnPremise.isEmpty()) {
+            log.warn("count is not found");
+            throw new DoesNotMatchException("Something went wrong");
+        }
+
+        String count = countOnPremise.get();
+
+        long resultOne = Long.parseLong(count.split(":")[1]) + productDetails.getCount();
+        theProduct.getCount().remove(count);
+        theProduct.getCount().add(getFormattedString(premise, resultOne));
+
+        productRepository.save(theProduct);
+        log.info("Successfully updated");
     }
 }

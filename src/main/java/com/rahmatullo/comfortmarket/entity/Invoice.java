@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.entity;
 
+import com.rahmatullo.comfortmarket.service.enums.Action;
 import com.rahmatullo.comfortmarket.service.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,9 @@ public class Invoice {
     @ManyToOne
     private User toUser;
     private String createdBy;
-    //remove property
-    private boolean isApproved;
+    @Enumerated(EnumType.STRING)
     private InvoiceStatus status;
+    @Enumerated(EnumType.STRING)
+    private Action action;
+    private Long previousId;
 }

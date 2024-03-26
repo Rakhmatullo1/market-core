@@ -22,4 +22,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> getAllByPremise(Premise premise, Pageable pageable);
 
     Optional<Product> findByIdAndOwner(Long id, User owner);
+
+    Optional<Product> findByBarcodeAndOwner(String barcode, User user);
+
+    Optional<Product> findByPremiseAndBarcode(Premise premise, String barcode);
 }
