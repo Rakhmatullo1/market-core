@@ -1,7 +1,9 @@
 package com.rahmatullo.comfortmarket.service.mapper;
 
-import com.rahmatullo.comfortmarket.entity.*;
-import com.rahmatullo.comfortmarket.repository.CategoryRepository;
+import com.rahmatullo.comfortmarket.entity.Premise;
+import com.rahmatullo.comfortmarket.entity.Product;
+import com.rahmatullo.comfortmarket.entity.ProductDetails;
+import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.dto.ProductCountDto;
@@ -24,8 +26,6 @@ import java.util.Objects;
 @Slf4j
 public abstract  class ProductMapper {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
     @Autowired
     private PremiseRepository premiseRepository;
     @Autowired
@@ -58,6 +58,7 @@ public abstract  class ProductMapper {
     @Mapping(target = "barcode", expression = "java(productDetails.getProductInfo().getBarcode())")
     @Mapping(target = "addedBy", expression = "java(getCreator())")
     @Mapping(target = "count", ignore = true)
+    @Mapping(target = "id", ignore = true)
     public abstract Product toProduct(ProductDetails productDetails);
 
     Date getCreatedTime() {

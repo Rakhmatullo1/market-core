@@ -23,7 +23,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdAndOwner(Long id, User owner);
 
-    Optional<Product> findByBarcodeAndOwner(String barcode, User user);
-
-    Optional<Product> findByPremiseAndBarcode(Premise premise, String barcode);
+    Optional<Product> findByOwnerAndBarcode(User owner, String barcode);
 }
