@@ -34,7 +34,7 @@ public abstract  class ProductMapper {
 
     @Mapping(target = "premise", ignore = true)
     @Mapping(target = "url", ignore = true)
-    @Mapping(target = "price", expression = "java(productDetails.getFinalPrice())")
+    @Mapping(target = "price", expression = "java(productDetails.getInitialPrice())")
     @Mapping(target = "owner", expression = "java(getOwner())")
     @Mapping(target = "name", expression = "java(productDetails.getProductInfo().getName())")
     @Mapping(target = "createdAt", expression = "java(getCreatedTime())")

@@ -17,4 +17,5 @@ public class UserDto{
     private boolean enabled;
     private String role;
     private List<String> premise;
+    private Double income;
 }

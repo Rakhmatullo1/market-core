@@ -8,6 +8,7 @@ import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.request.InvoiceRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.Action;
 import com.rahmatullo.comfortmarket.service.enums.InvoiceStatus;
+import com.rahmatullo.comfortmarket.service.enums.PremiseType;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.InvoiceMapper;
@@ -38,6 +39,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ProductDetailsRepository productDetailsRepository;
     private final ProductInfoRepository productInfoRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
     private final InvoiceMapper invoiceMapper;
     private final ProductMapper productMapper;
     private final AuthUtils authUtils;
@@ -84,6 +86,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setStatus(isApproved ? InvoiceStatus.ACCEPTED : InvoiceStatus.REJECTED);
 
         if(isApproved) {
+            checkPremiseType(invoice);
+
             if(!Objects.equals(invoice.getAction(), Action.IMPORT)){
                 subtractCountOnProduct(invoice);
             }
@@ -197,7 +201,24 @@ public class InvoiceServiceImpl implements InvoiceService {
         log.info("Requested subtract products from previous premise");
         Premise premise = premiseUtils.getPremise(invoice.getPreviousId());
 
+        setIncomeForOwner(invoice);
+
         invoice.getProductDetailsSet().forEach(p-> changeOnCount(p, premise));
+    }
+
+    private void setIncomeForOwner(Invoice invoice) {
+        if(Objects.equals(invoice.getAction(), Action.EXPORT)) {
+            User user = authUtils.getOwner();
+            Double oldIncome = user.getIncome();
+
+            if(Objects.isNull(user.getIncome())) {
+                oldIncome = 0d;
+            }
+
+            Double result = oldIncome+ invoice.getOverallFinalPrice()-invoice.getOverallInitialPrice();
+            user.setIncome(result);
+            userRepository.save(user);
+        }
     }
 
     private void changeOnCount(ProductDetails productDetails, Premise premise) {
@@ -223,5 +244,22 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private Optional<Product> getProduct(String barcode) {
         return  productRepository.findByOwnerAndBarcode(authUtils.getOwner(), barcode);
+    }
+
+    private void checkPremiseType(Invoice invoice) {
+        if(Objects.equals(invoice.getAction(), Action.IMPORT)) {
+            checkingPremiseType(invoice.getPremise().getId());
+        }
+
+        if(Objects.equals(invoice.getAction(), Action.EXPORT)) {
+            checkingPremiseType(invoice.getPreviousId());
+        }
+    }
+
+    private void checkingPremiseType(Long id){
+        if(Objects.equals(premiseUtils.getPremise(id).getType(), PremiseType.BIN)){
+            log.warn("You cannot export or import product to bin type premise");
+            throw new DoesNotMatchException("Premise type cannot be equal to Bin");
+        }
     }
 }
