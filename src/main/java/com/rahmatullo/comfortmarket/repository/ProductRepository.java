@@ -13,8 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    boolean existsByBarcode(String barcode);
-
     Page<Product> getAllByOwner(User user, Pageable pageable);
 
     Page<Product> getAllByCategoryAndOwner(Category category, User owner, Pageable pageable);

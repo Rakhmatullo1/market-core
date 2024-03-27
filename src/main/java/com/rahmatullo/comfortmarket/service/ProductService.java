@@ -1,7 +1,6 @@
 package com.rahmatullo.comfortmarket.service;
 
 import com.rahmatullo.comfortmarket.entity.Product;
-import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import org.springframework.data.domain.PageRequest;
@@ -19,5 +18,5 @@ public interface ProductService {
 
     MessageDto deleteProduct(Long id);
 
-    Product toProduct(Long id, User owner);
+    Product toProduct(Long id);
 }

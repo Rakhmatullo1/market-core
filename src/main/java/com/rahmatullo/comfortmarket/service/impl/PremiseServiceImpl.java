@@ -13,9 +13,9 @@ import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.request.PremiseRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
-import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
+import com.rahmatullo.comfortmarket.service.utils.PremiseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +35,7 @@ public class PremiseServiceImpl implements PremiseService {
     private final ProductRepository productRepository;
     private final PremiseMapper premiseMapper;
     private final AuthUtils authUtils;
+    private final PremiseUtils premiseUtils;
     private final UserService userService;
 
     @Override
@@ -47,7 +48,7 @@ public class PremiseServiceImpl implements PremiseService {
 
     @Override
     public PremiseDto findById(Long id) {
-        return premiseMapper.toPremiseDto(toPremise(id, authUtils.getOwner()));
+        return premiseMapper.toPremiseDto(premiseUtils.getPremise(id));
     }
 
     @Override
@@ -78,7 +79,7 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public PremiseDto addWorkers2Premise(Long id, Long userId) {
         log.info("Requested to add worker {} to premise {}", userId, id);
-        Premise premise = toPremise(id, authUtils.getOwner());
+        Premise premise = premiseUtils.getPremise(id);
 
         User worker = userService.toUser(userId);
 
@@ -93,7 +94,7 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public PremiseDto updatePremise(Long id, PremiseRequestDto premiseRequestDto) {
         log.info("Requested to update premise");
-        Premise premise = toPremise(id, authUtils.getOwner());
+        Premise premise = premiseUtils.getPremise(id);
         premise = premiseMapper.toPremise(premiseRequestDto, premise);
         log.info("Successfully updated");
         return premiseMapper.toPremiseDto(premiseRepository.save(premise));
@@ -109,15 +110,13 @@ public class PremiseServiceImpl implements PremiseService {
             throw new DoesNotMatchException("Your role does not match with any authorities");
         }
 
-        user = authUtils.getOwner();
-
         if(Objects.equals(id, destinationPremiseId)) {
             log.warn("destination premise and the premise cannot be same");
             throw new DoesNotMatchException("destination premise and the premise cannot be same");
         }
 
-        Premise premise = toPremise(id, user);
-        Premise destinationPremise = toPremise(destinationPremiseId,user);
+        Premise premise = premiseUtils.getPremise(id);
+        Premise destinationPremise = premiseUtils.getPremise(destinationPremiseId);
 
         for (User worker : premise.getWorkers()) {
             worker.getPremise().remove(premise);
@@ -142,12 +141,5 @@ public class PremiseServiceImpl implements PremiseService {
         premiseRepository.save(destinationPremise);
         premiseRepository.delete(premise);
         return new MessageDto("Successfully deleted and transferred to another premise");
-    }
-
-    private Premise toPremise(Long id, User user) {
-        return premiseRepository.findByOwnerAndId(user, id).orElseThrow(()->{
-            log.warn("premise is not found");
-            throw new NotFoundException("Premise is not found " + id);
-        });
     }
 }

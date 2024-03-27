@@ -4,7 +4,6 @@ import com.rahmatullo.comfortmarket.entity.Invoice;
 import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.ProductDetails;
 import com.rahmatullo.comfortmarket.entity.User;
-import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.service.dto.InvoiceDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDetailsDto;
 import com.rahmatullo.comfortmarket.service.dto.request.InvoiceRequestDto;
@@ -13,6 +12,7 @@ import com.rahmatullo.comfortmarket.service.enums.Action;
 import com.rahmatullo.comfortmarket.service.enums.InvoiceStatus;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
+import com.rahmatullo.comfortmarket.service.utils.PremiseUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -28,7 +28,7 @@ import java.util.Set;
 public abstract class InvoiceMapper {
 
     @Autowired
-    private PremiseRepository premiseRepository;
+    private PremiseUtils premiseUtils;
     @Autowired
     private AuthUtils authUtils;
     @Autowired
@@ -125,6 +125,6 @@ public abstract class InvoiceMapper {
     }
 
     Optional<Premise> getPremise(Long id){
-        return premiseRepository.findByOwnerAndId(authUtils.getOwner(), id);
+        return premiseUtils.getPremiseOptional(id);
     }
 }

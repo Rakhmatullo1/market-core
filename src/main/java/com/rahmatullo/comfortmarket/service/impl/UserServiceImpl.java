@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final PremiseRepository premiseRepository;
     private final PremiseMapper premiseMapper;
 
+
     public static  <T> List<T> getList(List<T> list) {
         if(list.size()>3) {
             return list.subList(0,3);

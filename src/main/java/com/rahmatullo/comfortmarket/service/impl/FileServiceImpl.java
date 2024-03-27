@@ -2,7 +2,6 @@ package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.config.StorageProperties;
 import com.rahmatullo.comfortmarket.entity.Product;
-import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.service.FileService;
 import com.rahmatullo.comfortmarket.service.ProductService;
@@ -12,7 +11,6 @@ import com.rahmatullo.comfortmarket.service.exception.EmptyFieldException;
 import com.rahmatullo.comfortmarket.service.exception.FileUploadException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
-import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,14 +40,12 @@ public class FileServiceImpl implements FileService {
     private String address;
 
     private final ProductService productService;
-    private final AuthUtils authUtils;
     private final Path photoLocation;
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
 
-    public FileServiceImpl(ProductService productService, AuthUtils authUtils, StorageProperties properties, ProductMapper productMapper, ProductRepository productRepository) {
+    public FileServiceImpl(ProductService productService, StorageProperties properties, ProductMapper productMapper, ProductRepository productRepository) {
         this.productService = productService;
-        this.authUtils = authUtils;
         photoLocation = Paths.get(properties.getPhotoLocation());
         this.productMapper = productMapper;
         this.productRepository = productRepository;
@@ -58,8 +54,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public ProductDto uploadPhoto2Product(Long id, MultipartFile file) {
         log.info("Requested to upload photo to product {}", id);
-        User user = authUtils.getOwner();
-        Product product = productService.toProduct(id, user);
+        Product product = productService.toProduct(id);
 
         if(Objects.isNull(file)|| file.isEmpty()){
             log.warn("File is empty or null");

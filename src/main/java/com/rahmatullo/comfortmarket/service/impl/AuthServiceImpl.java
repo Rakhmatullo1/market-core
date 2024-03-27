@@ -17,13 +17,10 @@ import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +68,14 @@ public class AuthServiceImpl implements AuthService {
 
         user = userRepository.save(user);
         String response = jwtService.generateToken(user);
+
+        createBinPremiseForOwner(user);
+
+        log.info("Successfully registered");
+        return new ResponseBodyDto(response);
+    }
+
+    private void createBinPremiseForOwner(User user) {
         if(Objects.equals(user.getRole(), UserRole.OWNER)){
             premiseService
                     .createPremise(PremiseRequestDto
@@ -80,39 +85,5 @@ public class AuthServiceImpl implements AuthService {
                             .type(PremiseType.BIN)
                             .build(), user);
         }
-
-        log.info("Successfully registered");
-        return new ResponseBodyDto(response);
-    }
-
-    @Override
-    public Optional<User> getUserOptional() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(Objects.isNull(authentication)) {
-            throw new NotFoundException("You should sign in");
-        }
-
-        String username = authentication.getName();
-
-        return userRepository.findByUsername(username);
-    }
-
-    @Override
-    public User getUser() {
-        return getUserOptional().orElseThrow(()->{
-            log.warn("User name is not found");
-            throw new RuntimeException("Username is not found");
-        });
-    }
-
-    @Override
-    public User getOwner() {
-        User user = getUser();
-
-        if(!Objects.equals(user.getRole(), UserRole.OWNER)) {
-            user = user.getOwner();
-        }
-
-        return user;
     }
 }
