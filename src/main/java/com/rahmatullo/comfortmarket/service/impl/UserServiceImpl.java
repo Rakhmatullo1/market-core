@@ -4,9 +4,11 @@ import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.UserRepository;
-import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.UserService;
-import com.rahmatullo.comfortmarket.service.dto.*;
+import com.rahmatullo.comfortmarket.service.dto.MessageDto;
+import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
+import com.rahmatullo.comfortmarket.service.dto.UserDto;
+import com.rahmatullo.comfortmarket.service.dto.UserDtoForOwner;
 import com.rahmatullo.comfortmarket.service.dto.request.UserRequestDto;
 import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
@@ -14,6 +16,7 @@ import com.rahmatullo.comfortmarket.service.exception.ExistsException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
 import com.rahmatullo.comfortmarket.service.mapper.UserMapper;
+import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final AuthService authService;
+    private final AuthUtils authUtils;
     private final PremiseRepository premiseRepository;
     private final PremiseMapper premiseMapper;
 
@@ -44,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all users");
-        User user = authService.getUser();
+        User user = authUtils.getUser();
 
         List<User> users = findUsers(user.getRole(), pageRequest);
         return users.stream().map(u->{
@@ -68,7 +71,7 @@ public class UserServiceImpl implements UserService {
     public UserDtoForOwner getUserInfo() {
         log.info("Requested to get user info");
 
-        User user = authService.getUser();
+        User user = authUtils.getUser();
         UserDtoForOwner userDtoForOwner = userMapper.toUserDtoForOwner(user);
 
         List<UserDto> users =user.getWorkers().stream().map(userMapper::toUserDto).toList();
@@ -84,7 +87,7 @@ public class UserServiceImpl implements UserService {
     public UserDto markUserAsEnabled(Long id, Long premiseId) {
         log.info("Requested to change status of user {}", id);
 
-        User owner = authService.getUser();
+        User owner = authUtils.getUser();
         User user = toUser(id);
 
         if(Objects.equals(owner.getRole(), UserRole.ADMIN)){
@@ -108,7 +111,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateProfile(UserRequestDto requestDto) {
         log.info("Requested to update profile");
-        User user = authService.getUser();
+        User user = authUtils.getUser();
 
         if(!Objects.equals(user.getUsername(), requestDto.getUsername()) && userRepository.existsByUsername(requestDto.getUsername())) {
            log.warn("The username exists ");
@@ -124,7 +127,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public MessageDto delete() {
         log.info("Requested to delete user");
-        User user = authService.getUser();
+        User user = authUtils.getUser();
         deleteUser(user);
         userRepository.delete(userRepository.save(user));
 
@@ -147,7 +150,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void checkUser(User userResult) {
-        User user = authService.getUser();
+        User user = authUtils.getUser();
 
         List<User> users = findUsers(user.getRole(), Pageable.unpaged());
 
@@ -192,9 +195,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void deleteUser(User user) {
-        user.getPremise().forEach(premise -> {
-            premise.getWorkers().remove(user);
-        });
+        user.getPremise().forEach(premise -> premise.getWorkers().remove(user));
 
         user.setPremise(null);
         user.setOwner(null);

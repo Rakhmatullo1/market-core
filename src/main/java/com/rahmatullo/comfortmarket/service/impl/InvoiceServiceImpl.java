@@ -2,7 +2,6 @@ package com.rahmatullo.comfortmarket.service.impl;
 
 import com.rahmatullo.comfortmarket.entity.*;
 import com.rahmatullo.comfortmarket.repository.*;
-import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.InvoiceService;
 import com.rahmatullo.comfortmarket.service.dto.InvoiceDto;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
@@ -14,6 +13,7 @@ import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.InvoiceMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductDetailsMapper;
 import com.rahmatullo.comfortmarket.service.mapper.ProductMapper;
+import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +39,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final PremiseRepository premiseRepository;
     private final InvoiceMapper invoiceMapper;
     private final ProductMapper productMapper;
-    private final AuthService authService;
+    private final AuthUtils authUtils;
 
     @Override
     public InvoiceDto create(InvoiceRequestDto requestDto) {
@@ -63,8 +63,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<InvoiceDto> getAll(Pageable pageable) {
         log.info("Requested to get all invoices");
-        List<Invoice> invoices = invoiceRepository.findAllByToUser(authService.getOwner() ,pageable).getContent();
+        List<Invoice> invoices = invoiceRepository.findAllByToUser(authUtils.getOwner() ,pageable).getContent();
         return invoices.stream().map(invoiceMapper::toInvoiceDto).toList();
+    }
+
+    @Override
+    public InvoiceDto getById(Long id) {
+        log.info("Requested to get by id {}", id);
+        return invoiceMapper.toInvoiceDto(toInvoice(id));
     }
 
     @Override
@@ -94,7 +100,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private Invoice toInvoice(Long id) {
-        return invoiceRepository.findByIdAndToUser(id, authService.getOwner()).orElseThrow(()->new NotFoundException("Invoice is not found"));
+        return invoiceRepository.findByIdAndToUser(id, authUtils.getOwner()).orElseThrow(()->new NotFoundException("Invoice is not found"));
     }
 
     private void addingProductsOnPremise(Invoice invoice) {
@@ -102,7 +108,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Premise premise = invoice.getPremise();
 
         invoice.getProductDetailsSet().forEach(p->{
-            Optional<Product> product =productRepository.findByOwnerAndBarcode(authService.getOwner(), p.getProductInfo().getBarcode());
+            Optional<Product> product =productRepository.findByOwnerAndBarcode(authUtils.getOwner(), p.getProductInfo().getBarcode());
             if(product.isEmpty()) {
                 createProductsOnPremise(p, premise);
             }
@@ -124,7 +130,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         log.info("Requested to create product on premise {}", premise.getId());
         Product theProduct =productMapper.toProduct(productDetails);
 
-        Optional<Product> product = productRepository.findByOwnerAndBarcode(authService.getOwner(), theProduct.getBarcode());
+        Optional<Product> product = productRepository.findByOwnerAndBarcode(authUtils.getOwner(), theProduct.getBarcode());
 
         if(product.isPresent()){
             theProduct.setId(product.get().getId());
@@ -142,15 +148,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private void updateProductsOnPremise(Product theProduct, ProductDetails productDetails, Premise premise){
         log.info("Requested to update product {} on premise {}", theProduct.getId(), premise.getId());
 
-        Optional<String> countOnPremise = findCount(premise.getId(), theProduct);
-
-        if(countOnPremise.isEmpty()) {
-            log.warn("count is not found");
-            throw new DoesNotMatchException("Something went wrong");
-        }
-
-        String count = countOnPremise.get();
-
+        String count  = findCount(premise.getId(), theProduct).orElseThrow(()->new DoesNotMatchException("Something went wrong"));
         updatingCountOnProduct(count, productDetails.getCount(), premise, theProduct);
 
         productRepository.save(theProduct);
@@ -175,13 +173,13 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private void checkProducts(InvoiceRequestDto invoice) {
         log.info("Checking products which are belonging to premise");
-        Premise premise = premiseRepository.findByOwnerAndId(authService.getOwner(), invoice.getPreviousId()).orElseThrow(()->new NotFoundException("Previous Premise is not found"));
+        Premise premise = premiseRepository.findByOwnerAndId(authUtils.getOwner(), invoice.getPreviousId()).orElseThrow(()->new NotFoundException("Previous Premise is not found"));
 
         invoice.getProducts().forEach(p->{
             ProductInfo productInfo = productInfoRepository.findById(p.getProductId()).orElseThrow(()->new NotFoundException("Product is not found "));
 
             Product product = productRepository
-                    .findByOwnerAndBarcode(authService.getOwner(), productInfo.getBarcode())
+                    .findByOwnerAndBarcode(authUtils.getOwner(), productInfo.getBarcode())
                     .orElseThrow(()->new NotFoundException("Product is not found on premise "+ premise.getName()));
 
             String oldCount = findCount(premise.getId(), product).orElseThrow(()-> {
@@ -201,7 +199,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private void subtractCountOnProduct(Invoice invoice) {
         log.info("Requested subtract products from previous premise");
         Premise premise = premiseRepository
-                .findByOwnerAndId(authService.getOwner(), invoice.getPreviousId())
+                .findByOwnerAndId(authUtils.getOwner(), invoice.getPreviousId())
                 .orElseThrow(()->new NotFoundException("Previous premise is not found"));
 
         invoice.getProductDetailsSet().forEach(p-> changeOnCount(p, premise));
@@ -209,7 +207,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private void changeOnCount(ProductDetails productDetails, Premise premise) {
         log.info("Requested change count of product on premise");
-        Product product = productRepository.findByOwnerAndBarcode(authService.getOwner(), productDetails.getProductInfo().getBarcode()).orElseThrow(()->new NotFoundException("Product is not found on the premise"));
+        Product product = productRepository.findByOwnerAndBarcode(authUtils.getOwner(), productDetails.getProductInfo().getBarcode()).orElseThrow(()->new NotFoundException("Product is not found on the premise"));
 
         String count = findCount(premise.getId(), product).orElseThrow(()->new DoesNotMatchException("Something went wrong"));
         product.getCount().remove(count);

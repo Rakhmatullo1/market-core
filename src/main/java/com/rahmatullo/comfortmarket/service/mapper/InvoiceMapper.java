@@ -5,7 +5,6 @@ import com.rahmatullo.comfortmarket.entity.Premise;
 import com.rahmatullo.comfortmarket.entity.ProductDetails;
 import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
-import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.dto.InvoiceDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDetailsDto;
 import com.rahmatullo.comfortmarket.service.dto.request.InvoiceRequestDto;
@@ -13,6 +12,7 @@ import com.rahmatullo.comfortmarket.service.dto.request.ProductDetailsRequestDto
 import com.rahmatullo.comfortmarket.service.enums.Action;
 import com.rahmatullo.comfortmarket.service.enums.InvoiceStatus;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
+import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -30,7 +30,7 @@ public abstract class InvoiceMapper {
     @Autowired
     private PremiseRepository premiseRepository;
     @Autowired
-    private AuthService authService;
+    private AuthUtils authUtils;
     @Autowired
     private ProductDetailsMapper productDetailsMapper;
 
@@ -59,18 +59,18 @@ public abstract class InvoiceMapper {
 
     @Named("getOverallInitialPrice")
     Double getOverallInitialPrice(List<ProductDetailsRequestDto> products) {
-        Double result=0d;
+        double result=0d;
         for (ProductDetailsRequestDto p : products) {
-            result += p.getInitialPrice();
+            result += p.getInitialPrice()*p.getCount();
         }
         return result;
     }
 
     @Named("getOverallFinalPrice")
     Double getOverallFinalPrice(List<ProductDetailsRequestDto> products) {
-        Double result=0d;
+        double result=0d;
         for (ProductDetailsRequestDto p : products) {
-            result += p.getFinalPrice();
+            result += (p.getFinalPrice()*p.getCount());
         }
         return result;
     }
@@ -84,11 +84,11 @@ public abstract class InvoiceMapper {
     }
 
     User getOwner() {
-        return authService.getOwner();
+        return authUtils.getOwner();
     }
 
     String  getCreator() {
-        return authService.getUser().getUsername();
+        return authUtils.getUser().getUsername();
     }
 
     @Named("getProducts")
@@ -125,6 +125,6 @@ public abstract class InvoiceMapper {
     }
 
     Optional<Premise> getPremise(Long id){
-        return premiseRepository.findByOwnerAndId(authService.getOwner(), id);
+        return premiseRepository.findByOwnerAndId(authUtils.getOwner(), id);
     }
 }

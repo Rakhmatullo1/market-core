@@ -6,7 +6,6 @@ import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.repository.PremiseRepository;
 import com.rahmatullo.comfortmarket.repository.ProductRepository;
 import com.rahmatullo.comfortmarket.repository.UserRepository;
-import com.rahmatullo.comfortmarket.service.AuthService;
 import com.rahmatullo.comfortmarket.service.PremiseService;
 import com.rahmatullo.comfortmarket.service.UserService;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
@@ -16,6 +15,7 @@ import com.rahmatullo.comfortmarket.service.enums.UserRole;
 import com.rahmatullo.comfortmarket.service.exception.DoesNotMatchException;
 import com.rahmatullo.comfortmarket.service.exception.NotFoundException;
 import com.rahmatullo.comfortmarket.service.mapper.PremiseMapper;
+import com.rahmatullo.comfortmarket.service.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -34,39 +34,42 @@ public class PremiseServiceImpl implements PremiseService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PremiseMapper premiseMapper;
-    private final AuthService authService;
+    private final AuthUtils authUtils;
     private final UserService userService;
 
     @Override
     public List<PremiseDto> findAll(PageRequest pageRequest) {
         log.info("Requested to get all premises");
-        User user = authService.getOwner();
+        User user = authUtils.getOwner();
         return premiseRepository.findAllByOwner(user, pageRequest)
                 .map(premiseMapper::toPremiseDto).toList();
     }
 
     @Override
     public PremiseDto findById(Long id) {
-        return premiseMapper.toPremiseDto(toPremise(id, authService.getOwner()));
+        return premiseMapper.toPremiseDto(toPremise(id, authUtils.getOwner()));
     }
 
     @Override
     public PremiseDto createPremise(PremiseRequestDto premiseRequestDto) {
         log.info("Requested to create new premise");
+        User ownerUser = authUtils.getUser();
+        return createPremise(premiseRequestDto, ownerUser);
+    }
+
+    @Override
+    public PremiseDto createPremise(PremiseRequestDto premiseRequestDto, User owner) {
         Premise premise = premiseMapper.toPremise(premiseRequestDto);
-
-        User ownerUser = authService.getUser();
-
-        if(!Objects.equals(ownerUser.getRole(), UserRole.OWNER)){
-            log.warn("user role does not match {}", ownerUser.getRole().name());
+        if(!Objects.equals(owner.getRole(), UserRole.OWNER)){
+            log.warn("user role does not match {}", owner.getRole().name());
             throw new DoesNotMatchException("Your role does not match");
         }
 
-        premise.setOwner(ownerUser);
+        premise.setOwner(owner);
         premise = premiseRepository.save(premise);
 
-        ownerUser.getPremise().add(premise);
-        userRepository.save(ownerUser);
+        owner.getPremise().add(premise);
+        userRepository.save(owner);
 
         log.info("Successfully added new premise [{}]", premiseRequestDto);
         return premiseMapper.toPremiseDto(premise);
@@ -75,7 +78,7 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public PremiseDto addWorkers2Premise(Long id, Long userId) {
         log.info("Requested to add worker {} to premise {}", userId, id);
-        Premise premise = toPremise(id, authService.getOwner());
+        Premise premise = toPremise(id, authUtils.getOwner());
 
         User worker = userService.toUser(userId);
 
@@ -90,7 +93,7 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public PremiseDto updatePremise(Long id, PremiseRequestDto premiseRequestDto) {
         log.info("Requested to update premise");
-        Premise premise = toPremise(id, authService.getOwner());
+        Premise premise = toPremise(id, authUtils.getOwner());
         premise = premiseMapper.toPremise(premiseRequestDto, premise);
         log.info("Successfully updated");
         return premiseMapper.toPremiseDto(premiseRepository.save(premise));
@@ -99,14 +102,14 @@ public class PremiseServiceImpl implements PremiseService {
     @Override
     public MessageDto deletePremise(Long id, Long destinationPremiseId) {
         log.info("Requested to delete premise id {}", id);
-        User user = authService.getUser();
+        User user = authUtils.getUser();
 
         if(!Objects.equals(user.getRole(), UserRole.OWNER)) {
             log.warn("user role {}", user.getRole().name());
             throw new DoesNotMatchException("Your role does not match with any authorities");
         }
 
-        user = authService.getOwner();
+        user = authUtils.getOwner();
 
         if(Objects.equals(id, destinationPremiseId)) {
             log.warn("destination premise and the premise cannot be same");

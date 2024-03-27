@@ -28,6 +28,11 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceService.getAll(PageRequest.of(page, size)));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<InvoiceDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(invoiceService.getById(id));
+    }
+
     @PostMapping("/make-decision/{id}")
     public ResponseEntity<MessageDto> makeDecision(@PathVariable Long id, @RequestParam boolean isApproved ){
         return ResponseEntity.ok(invoiceService.makeDecision(isApproved, id));

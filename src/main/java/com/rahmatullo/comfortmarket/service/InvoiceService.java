@@ -12,5 +12,7 @@ public interface InvoiceService {
 
     List<InvoiceDto> getAll(Pageable pageable);
 
+    InvoiceDto getById(Long id);
+
     MessageDto makeDecision(boolean isApproved, Long invoiceId);
 }

@@ -1,5 +1,6 @@
 package com.rahmatullo.comfortmarket.service;
 
+import com.rahmatullo.comfortmarket.entity.User;
 import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.PremiseDto;
 import com.rahmatullo.comfortmarket.service.dto.request.PremiseRequestDto;
@@ -13,6 +14,8 @@ public interface PremiseService {
     PremiseDto findById(Long id);
 
     PremiseDto createPremise(PremiseRequestDto premiseRequestDto);
+
+    PremiseDto createPremise(PremiseRequestDto premiseRequestDto, User owner);
 
     PremiseDto updatePremise(Long id, PremiseRequestDto premiseRequestDto);
 

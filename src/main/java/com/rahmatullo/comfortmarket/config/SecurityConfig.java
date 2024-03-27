@@ -38,8 +38,6 @@ public class SecurityConfig {
                             r.requestMatchers("/premise/**").hasAuthority(UserRole.OWNER.name());
                             r.requestMatchers(HttpMethod.GET, "/products/assets/photos/**").permitAll();
                             r.requestMatchers("/products/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
-                            r.requestMatchers("/proposal/**").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
-                            r.requestMatchers("/proposal/decision/**").hasAuthority(UserRole.OWNER.name());
                             r.requestMatchers("/invoice").hasAnyAuthority(UserRole.OWNER.name(), UserRole.WORKER.name());
                             r.requestMatchers("/invoice/make-decision/**").hasAuthority(UserRole.OWNER.name());
                         }

@@ -7,9 +7,6 @@ import com.rahmatullo.comfortmarket.service.dto.MessageDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductDto;
 import com.rahmatullo.comfortmarket.service.dto.ProductInfoDto;
 import com.rahmatullo.comfortmarket.service.dto.request.ProductInfoRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.request.ProductRequestDto;
-import com.rahmatullo.comfortmarket.service.dto.ProductTransferDto;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
@@ -63,21 +60,6 @@ public class ProductController {
     @PostMapping("/upload-file/{id}")
     public ResponseEntity<ProductDto> uploadFile(@RequestParam MultipartFile file, @PathVariable Long id) {
         return ResponseEntity.ok(fileService.uploadPhoto2Product(id, file));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDto productRequestDto, @RequestParam Long premiseId){
-        return ResponseEntity.ok(productService.updateProduct(id, productRequestDto, premiseId));
-    }
-
-    @PutMapping("/transfer/part/{id}")
-    public ResponseEntity<ProductDto> transferProductPartly(@PathVariable Long id , @RequestBody ProductTransferDto productTransferDto) {
-        return ResponseEntity.ok(productService.transfersProductPartly(id, productTransferDto));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<MessageDto> deleteProduct(@PathVariable Long id, @RequestParam Long premiseId){
-        return ResponseEntity.ok(productService.deleteProduct(id, premiseId));
     }
 
     @DeleteMapping("/all/{id}")
