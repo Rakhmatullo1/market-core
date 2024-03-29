@@ -178,7 +178,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Premise premise = premiseUtils.getPremise(invoice.getPreviousId());
 
         invoice.getProducts().forEach(p->{
-            ProductInfo productInfo = productInfoRepository.findById(p.getProductId()).orElseThrow(()->new NotFoundException("Product is not found "));
+            ProductInfo productInfo = productInfoRepository.findByBarcode(p.getBarcode()).orElseThrow(()->new NotFoundException("Product is not found "));
 
             Product product = getProduct(productInfo.getBarcode())
                     .orElseThrow(()->new NotFoundException("Product is not found on premise "+ premise.getName()));

@@ -21,6 +21,12 @@ public class ProductInfoController {
         return ResponseEntity.ok(productInfoService.getAll(PageRequest.of(page, size)));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductInfoDto> findById(@PathVariable Long id){
+        return ResponseEntity.ok(productInfoService.getById(id));
+    }
+
+
     @PostMapping
     public ResponseEntity<ProductInfoDto> create(@RequestBody ProductInfoRequestDto productRequestDto) {
         return ResponseEntity.ok(productInfoService.create(productRequestDto));

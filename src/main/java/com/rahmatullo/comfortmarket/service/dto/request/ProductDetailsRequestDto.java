@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ProductDetailsRequestDto {
-    private Long productId;
+    private String barcode;
     private Long count;
     private Double initialPrice;
     private Double finalPrice;

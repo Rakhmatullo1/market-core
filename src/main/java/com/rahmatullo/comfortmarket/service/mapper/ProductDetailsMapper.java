@@ -17,7 +17,7 @@ public abstract class ProductDetailsMapper {
     @Autowired
     private ProductInfoRepository productInfoRepository;
 
-    @Mapping(target = "productInfo", source = "productId", qualifiedByName = "getProductInfo")
+    @Mapping(target = "productInfo", source = "barcode", qualifiedByName = "getProductInfo")
     @Mapping(target = "id", ignore = true)
     public abstract ProductDetails toProductDetails(ProductDetailsRequestDto requestDto);
 
@@ -26,7 +26,7 @@ public abstract class ProductDetailsMapper {
     public abstract ProductDetailsDto toProductDetailsDto(ProductDetails productDetails);
 
     @Named("getProductInfo")
-    ProductInfo getProductInfo(Long id) {
-        return productInfoRepository.findById(id).orElseThrow(()->new NotFoundException("Product is not found"));
+    ProductInfo getProductInfo(String barcode) {
+        return productInfoRepository.findByBarcode(barcode).orElseThrow(()->new NotFoundException("Product is not found"));
     }
 }
