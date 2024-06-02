@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  spring-app:
+    image: 'docker-spring-boot-postgres:latest'
+    build:
+      context: .
+    container_name: spring-container
+    ports:
+      - "8088:8088"
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/market?autoReconnect=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: raaxiim
+      SPRING_DATASOURCE_PASSWORD: Raax11m17
+
+
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: Raax11m17
+      MYSQL_DATABASE: market
+      MYSQL_USER: raaxiim
+      MYSQL_PASSWORD: Raax11m17
+    ports:
+      - "3307:3306"
+

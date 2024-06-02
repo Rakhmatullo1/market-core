@@ -18,6 +18,7 @@ public class Product {
     private String name;
     private String barcode;
     private Date createdAt;
+    private String article;
     @ElementCollection
     private List<String> count=new ArrayList<>();
     private Double price;

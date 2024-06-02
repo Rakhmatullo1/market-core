@@ -22,4 +22,5 @@ public class ProductInfo {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+    private String article;
 }

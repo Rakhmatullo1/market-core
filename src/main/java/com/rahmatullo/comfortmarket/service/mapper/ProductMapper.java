@@ -32,9 +32,10 @@ public abstract  class ProductMapper {
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "date")
     public abstract ProductDto toProductDto(Product product);
 
+    @Mapping(target = "article", expression = "java(productDetails.getProductInfo().getArticle())")
     @Mapping(target = "premise", ignore = true)
     @Mapping(target = "url", ignore = true)
-    @Mapping(target = "price", expression = "java(productDetails.getInitialPrice())")
+    @Mapping(target = "price", ignore = true)
     @Mapping(target = "owner", expression = "java(getOwner())")
     @Mapping(target = "name", expression = "java(productDetails.getProductInfo().getName())")
     @Mapping(target = "createdAt", expression = "java(getCreatedTime())")

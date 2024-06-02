@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: classpath:liquibase/db/20240416_changing_product.xml

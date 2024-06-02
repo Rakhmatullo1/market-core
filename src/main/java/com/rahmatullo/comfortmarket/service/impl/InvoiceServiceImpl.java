@@ -131,7 +131,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private void createProductsOnPremise(ProductDetails productDetails, Premise premise) {
         log.info("Requested to create product on premise {}", premise.getId());
         Product theProduct =productMapper.toProduct(productDetails);
-
+        theProduct.setPrice(productDetails.getFinalPrice());
         Optional<Product> product = getProduct(theProduct.getBarcode());
 
         if(product.isPresent()){

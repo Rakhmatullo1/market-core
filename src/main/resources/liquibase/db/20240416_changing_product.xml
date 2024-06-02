@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="Rahmatullo">
+        <preConditions>
+            <not>
+                <columnExists tableName="product_info" columnName="article"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product_info">
+            <column name="article" type="VARCHAR(255)"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2" author="Rahmatullo">
+        <preConditions>
+            <not>
+                <columnExists tableName="product" columnName="article"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="article" type="VARCHAR(255)"></column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -32,6 +32,11 @@ public class ProductInfoServiceImpl implements ProductInfoService {
             throw new ExistsException("Product exists in database");
         }
 
+        if(productInfoRepository.existsByBarcode(productInfoRequestDto.getArticle())){
+            log.warn("Article exists");
+            throw new ExistsException("Article exists in database");
+        }
+
         ProductInfo productInfo = productInfoMapper.toProductInfo(productInfoRequestDto);
         return productInfoMapper.toProductInfoDto(productInfoRepository.save(productInfo));
     }
