@@ -5,7 +5,7 @@ spring:
     password: Raax11m17
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
   liquibase:
     change-log: classpath:liquibase/changelog-master.yaml
     enabled: false
