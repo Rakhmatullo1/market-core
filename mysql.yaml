@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: Raax11m17
+      MYSQL_DATABASE: market
+      MYSQL_USER: raaxiim
+      MYSQL_PASSWORD: Raax11m17
+    ports:
+      - "3307:3306"
