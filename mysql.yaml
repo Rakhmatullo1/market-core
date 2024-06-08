@@ -11,3 +11,7 @@ services:
       MYSQL_PASSWORD: Raax11m17
     ports:
       - "3307:3306"
+    volumes:
+      - market:/var/lib/mysql
+volumes:
+  market:

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="22" author="Rahmatullo">
+        <createTable tableName="invoice">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date" type="date"/>
+            <column name="overall_final_price" type="DOUBLE"/>
+            <column name="overall_initial_price" type="DOUBLE"/>
+            <column name="premise_id" type="BIGINT"/>
+            <column name="previous_id" type="BIGINT"/>
+            <column name="to_user_id" type="BIGINT"/>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="description" type="varchar(1024)"/>
+            <column name="action" type="ENUM('IMPORT', 'EXPORT', 'TRANSFER')"/>
+            <column name="status" type="ENUM('PENDING', 'ACCEPTED', 'REJECTED')"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="23" author="Rahmatullo">
+        <addForeignKeyConstraint baseTableName="invoice" baseColumnNames="premise_id" constraintName="FKkuquee31teplyffdb0rla4vhy" referencedTableName="premise"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="invoice" baseColumnNames="to_user_id" constraintName="FK87e8ckcvwamsm5vcgh00p3k23" referencedTableName="user"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

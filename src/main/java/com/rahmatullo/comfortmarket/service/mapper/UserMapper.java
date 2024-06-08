@@ -20,7 +20,7 @@ public abstract class UserMapper {
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "workers", ignore = true)
     @Mapping(target = "premise", ignore = true)
-    @Mapping(target = "enabled", constant = "false", resultType = Boolean.class)
+    @Mapping(target = "enabled", constant = "true", resultType = Boolean.class)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", source = "role")

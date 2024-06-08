@@ -5,10 +5,10 @@ spring:
     password: Raax11m17
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
   liquibase:
     change-log: classpath:liquibase/changelog-master.yaml
-    enabled: false
+    enabled: true
 server:
   port: 8088
 

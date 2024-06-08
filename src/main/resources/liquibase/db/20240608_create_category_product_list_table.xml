@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="11" author="Rahmatullo">
+        <createTable tableName="category_product_list">
+            <column name="category_id" type="BIGINT" >
+                <constraints  nullable="false"/>
+            </column>
+            <column name="product_list_id" type="BIGINT"  >
+                <constraints  nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="12" author="Rahmatullo">
+        <addForeignKeyConstraint baseTableName="category_product_list" baseColumnNames="category_id" constraintName="FK42q7lnw17dw85uhtqkj9o3sjk" referencedTableName="category"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="13" author="Rahmatullo">
+        <addForeignKeyConstraint baseTableName="category_product_list" baseColumnNames="product_list_id" constraintName="FKh85ou722rt68a3pj6d40u114m" referencedTableName="product"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

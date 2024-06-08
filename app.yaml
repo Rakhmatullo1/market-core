@@ -1,4 +1,9 @@
 version: '3.8'
+
+networks:
+  kcnet:
+    driver: bridge
+
 services:
   spring-app:
     image: 'docker-spring-boot-postgres:latest'
@@ -13,7 +18,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/market?autoReconnect=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: raaxiim
       SPRING_DATASOURCE_PASSWORD: Raax11m17
-
+    networks:
+      - kcnet
 
 
   mysql-db:
@@ -26,4 +32,6 @@ services:
       MYSQL_PASSWORD: Raax11m17
     ports:
       - "3307:3306"
+    networks:
+      - kcnet
 

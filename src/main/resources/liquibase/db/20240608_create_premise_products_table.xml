@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20" author="Rahmatullo">
+        <createTable tableName="premise_products">
+            <column name="premise_id" type="BIGINT" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="products_id" type="BIGINT" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="21" author="Rahmatullo">
+        <addForeignKeyConstraint baseTableName="premise_products" baseColumnNames="premise_id" constraintName="FKjannmbww8ww1r1g3t5ebt6sv8" referencedTableName="premise"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="premise_products" baseColumnNames="products_id" constraintName="FK1eboi9sql2req9xfbjioveyfx" referencedTableName="product"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="8" author="Rahmatullo">
+        <createTable tableName="product">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="price" type="DOUBLE"/>
+            <column name="category_id" type="BIGINT"/>
+            <column name="created_at" type="DATETIME"/>
+            <column name="owner_id" type="BIGINT"/>
+            <column name="added_by" type="VARCHAR(255)"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+            <column name="article" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="9" author="Rahmatullo">
+        <addForeignKeyConstraint baseTableName="product" baseColumnNames="category_id" constraintName="FK1mtsbur82frn64de7balymq9s" referencedTableName="category"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="10" author="Rahmatullo">
+        <addForeignKeyConstraint baseTableName="product" baseColumnNames="owner_id" constraintName="FKn3le0a5l0wmq4gs20rn3ty36x" referencedTableName="user"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
