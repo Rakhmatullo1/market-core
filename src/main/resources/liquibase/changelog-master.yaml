@@ -23,4 +23,6 @@ databaseChangeLog:
       file: classpath:liquibase/db/20240608_create_invoice_table.xml
   - include:
       file: classpath:liquibase/db/20240608_create_table_invoice_product_details_set.xml
+  - include:
+      file: classpath:liquibase/db/20240611_change_invoice_table.xml
 

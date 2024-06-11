@@ -21,10 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.rahmatullo.comfortmarket.service.mapper.ProductMapper.getFormattedString;
@@ -63,7 +60,16 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<InvoiceDto> getAll(Pageable pageable) {
         log.info("Requested to get all invoices");
-        List<Invoice> invoices = invoiceRepository.findAllByToUser(authUtils.getOwner() ,pageable).getContent();
+        List<Invoice> invoices = invoiceRepository.findAllByToUser(authUtils.getOwner() ,pageable).stream().collect(Collectors.toList());
+        invoices.sort((o1, o2) -> {
+            if (o2.getDate().before(o1.getDate())) {
+                return -1;
+            } else if (o1.getDate().before(o2.getDate())) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
         return invoices.stream().map(invoiceMapper::toInvoiceDto).toList();
     }
 

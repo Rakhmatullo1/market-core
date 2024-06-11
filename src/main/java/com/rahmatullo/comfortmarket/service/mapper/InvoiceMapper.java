@@ -18,7 +18,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

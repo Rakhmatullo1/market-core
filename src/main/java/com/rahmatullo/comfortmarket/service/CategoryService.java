@@ -15,4 +15,6 @@ public interface CategoryService {
     CategoryDto findById(Long id);
 
     Category toCategory(Long id);
+
+    CategoryDto updateCategory(Long id, String name);
 }
