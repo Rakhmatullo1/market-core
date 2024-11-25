@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: ${CM_DB:jdbc:mysql://localhost:3307/market}
+    username: ${CM_DB_USER:mysql}
+    password: ${CM_DB_PASSWORD:msql123}
+server:
+  port: 8088
+
+storage:
+  photoLocation: assets/photos
+cm:
+  address: ${PHOTO_URL:localhost}:8088

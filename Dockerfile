@@ -1,9 +1,11 @@
-FROM amazoncorretto:17
+FROM maven:3.9.5-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean
+RUN mvn package -DskipTests
 
-ARG JAR_FILE=target/*.jar
-
-COPY ${JAR_FILE} application.jar
-
-CMD apt-get update -y
-
-ENTRYPOINT ["java", "-Xmx2048M", "-jar", "/application.jar"]
+FROM eclipse-temurin:17-jdk
+EXPOSE 8088
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]

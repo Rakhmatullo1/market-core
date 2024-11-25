@@ -1,15 +1,31 @@
-version: '3.3'
+version: '3.8'
 
 services:
-  database:
+  cm-database:
     platform: linux/x86_64
-    container_name: "db"
+    container_name: cm-database
     image: mysql
     restart: always
     environment:
-      MYSQL_DATABASE: 'market'
-      MYSQL_USER: 'raaxiim'
-      MYSQL_PASSWORD: 'Raax11m17'
-      MYSQL_ROOT_PASSWORD: 'abc'
+      MYSQL_ROOT_PASSWORD: mysql-root
+      MYSQL_DATABASE: market
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: msql123
     ports:
       - '3307:3306'
+    volumes:
+      - cm-volume:/var/lib/mysql
+  cm-core:
+    build:
+      context: .
+    ports:
+      - "8088:8088"
+    environment:
+      CM_DB: jdbc:mysql://cm-database:3306/market
+      CM_DB_USER: mysql
+      CM_DB_PASSWORD: msql123
+      PHOTO_URL: localhost
+    depends_on:
+      - cm-database
+volumes:
+  cm-volume:
